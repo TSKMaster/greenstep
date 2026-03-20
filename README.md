@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GreenStep
 
-## Getting Started
+GreenStep - MVP веб-приложения для повышения экологической ответственности жителей района.
 
-First, run the development server:
+## Что делаем
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Проект создается как конкурсный MVP со следующими принципами:
+- только нужный функционал для MVP
+- без усложнения архитектуры
+- основной упор на работоспособность
+- экраны из папки `MVP` реализуются с логикой
+- экраны из папки `Demo` реализуются как заглушки
+
+## Технологии
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Leaflet
+
+## Текущий статус
+
+Сделан базовый проект на Next.js, очищен стартовый шаблон, подготовлена базовая структура каталогов и добавлена база для подключения Supabase.
+
+## Структура проекта
+
+- `src/app` - маршруты и глобальные стили
+- `src/components` - переиспользуемые компоненты
+- `src/lib` - константы и вспомогательные модули
+- `src/types` - общие типы проекта
+
+## Подключение Supabase
+
+Используются переменные окружения:
+
+```txt
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+В проект добавлены заготовки клиентов:
+- `src/lib/supabase/client.ts`
+- `src/lib/supabase/server.ts`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Что уже работает
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- базовая страница проекта
+- подключение Supabase по environment variables
+- таблицы для пользователей, заявок и комментариев
+- вход через magic link
+- создание заявки с сохранением в таблицу `reports`
+- личный кабинет со списком своих заявок
+- общий список заявок и карточка отдельной заявки
+- карта заявок на Leaflet
+- базовая статистика по данным из `reports`
+- админка для смены статусов и комментариев
+- главный экран MVP на реальных данных пользователя и заявок
 
-## Learn More
+## Запуск проекта
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Адрес в браузере
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```txt
+http://localhost:3000
+```
