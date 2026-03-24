@@ -39,7 +39,7 @@ export default async function ReportDetailsPage({
     supabase
       .from("reports")
       .select(
-        "id, address, admin_comment, category, created_at, description, is_anonymous, latitude, longitude, photo_url, status, support_count",
+        "id, user_id, address, admin_comment, category, created_at, description, is_anonymous, latitude, longitude, photo_url, status, support_count",
       )
       .eq("id", id)
       .single(),
@@ -57,6 +57,7 @@ export default async function ReportDetailsPage({
 
   const report = data as ReportListItem;
   const hasSupported = Boolean(supportRow);
+  const isOwnReport = report.user_id === user.id;
   const supportAction = supportReport.bind(null, report.id);
 
   return (
@@ -113,7 +114,11 @@ export default async function ReportDetailsPage({
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          {hasSupported ? (
+          {isOwnReport ? (
+            <div className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-center font-semibold text-slate-700 sm:flex-1">
+              Это твоя заявка
+            </div>
+          ) : hasSupported ? (
             <div className="inline-flex w-full items-center justify-center rounded-2xl bg-emerald-100 px-4 py-3 text-center font-semibold text-emerald-800 sm:flex-1">
               Ты уже поддержал это обращение
             </div>

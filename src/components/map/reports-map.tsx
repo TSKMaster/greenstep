@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { DEFAULT_MAP_CENTER } from "@/lib/constants";
+import { useEffect } from "react";
 import { icon } from "leaflet";
+import Link from "next/link";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { DEFAULT_MAP_CENTER } from "@/lib/constants";
 import type { ReportListItem } from "@/types";
 
 const markerIcon = icon({
@@ -19,6 +20,22 @@ type ReportsMapProps = {
   reports: ReportListItem[];
 };
 
+function ResizeMapOnMount() {
+  const map = useMap();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      map.invalidateSize();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [map]);
+
+  return null;
+}
+
 export function ReportsMap({ reports }: ReportsMapProps) {
   return (
     <div className="h-[560px] overflow-hidden rounded-[28px] border border-border">
@@ -27,12 +44,9 @@ export function ReportsMap({ reports }: ReportsMapProps) {
         zoom={15}
         scrollWheelZoom
         className="h-full w-full"
-        whenReady={(event) => {
-          window.setTimeout(() => {
-            event.target.invalidateSize();
-          }, 0);
-        }}
       >
+        <ResizeMapOnMount />
+
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -1,7 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
 import { icon } from "leaflet";
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import { DEFAULT_MAP_CENTER } from "@/lib/constants";
 
 const markerIcon = icon({
@@ -31,15 +38,31 @@ function MapClickHandler({
   return null;
 }
 
+function ResizeMapOnMount() {
+  const map = useMap();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      map.invalidateSize();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [map]);
+
+  return null;
+}
+
 export function ReportLocationPicker({
   latitude,
   longitude,
   onChange,
 }: ReportLocationPickerProps) {
-  const center = [
+  const center: [number, number] = [
     Number.isFinite(latitude) ? latitude : DEFAULT_MAP_CENTER.lat,
     Number.isFinite(longitude) ? longitude : DEFAULT_MAP_CENTER.lng,
-  ] as const;
+  ];
 
   return (
     <div className="overflow-hidden rounded-[28px] border border-border bg-white">
@@ -48,12 +71,8 @@ export function ReportLocationPicker({
         zoom={16}
         scrollWheelZoom
         className="h-72 w-full"
-        whenReady={(event) => {
-          window.setTimeout(() => {
-            event.target.invalidateSize();
-          }, 0);
-        }}
       >
+        <ResizeMapOnMount />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -34,6 +34,7 @@ export type ReportListItem = {
   longitude: number;
   photo_url?: string | null;
   admin_comment?: string | null;
+  user_id?: string | null;
   status: RequestStatus;
   support_count: number;
 };
