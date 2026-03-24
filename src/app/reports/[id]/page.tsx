@@ -35,19 +35,28 @@ export default async function ReportDetailsPage({
     redirect("/auth/sign-in");
   }
 
-  const { data, error } = await supabase
-    .from("reports")
-    .select(
-      "id, address, admin_comment, category, created_at, description, is_anonymous, latitude, longitude, photo_url, status, support_count",
-    )
-    .eq("id", id)
-    .single();
+  const [{ data, error }, { data: supportRow }] = await Promise.all([
+    supabase
+      .from("reports")
+      .select(
+        "id, address, admin_comment, category, created_at, description, is_anonymous, latitude, longitude, photo_url, status, support_count",
+      )
+      .eq("id", id)
+      .single(),
+    supabase
+      .from("report_supports")
+      .select("report_id")
+      .eq("report_id", id)
+      .eq("user_id", user.id)
+      .maybeSingle(),
+  ]);
 
   if (error || !data) {
     notFound();
   }
 
   const report = data as ReportListItem;
+  const hasSupported = Boolean(supportRow);
   const supportAction = supportReport.bind(null, report.id);
 
   return (
@@ -104,14 +113,20 @@ export default async function ReportDetailsPage({
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <form action={supportAction} className="sm:flex-1">
-            <button
-              type="submit"
-              className="w-full rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
-            >
-              Поддержать обращение
-            </button>
-          </form>
+          {hasSupported ? (
+            <div className="inline-flex w-full items-center justify-center rounded-2xl bg-emerald-100 px-4 py-3 text-center font-semibold text-emerald-800 sm:flex-1">
+              Ты уже поддержал это обращение
+            </div>
+          ) : (
+            <form action={supportAction} className="sm:flex-1">
+              <button
+                type="submit"
+                className="w-full rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+              >
+                Поддержать обращение
+              </button>
+            </form>
+          )}
 
           <Link
             href="/reports"

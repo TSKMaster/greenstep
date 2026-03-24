@@ -14,26 +14,25 @@ export async function supportReport(reportId: string) {
     throw new Error("Для поддержки заявки нужно войти в систему.");
   }
 
-  const { data: report, error: selectError } = await supabase
-    .from("reports")
-    .select("support_count")
-    .eq("id", reportId)
-    .single();
+  const { error } = await supabase.from("report_supports").insert({
+    report_id: reportId,
+    user_id: user.id,
+  });
 
-  if (selectError || !report) {
-    throw new Error("Не удалось найти заявку.");
+  if (error?.code === "42P01") {
+    throw new Error(
+      "Для защиты поддержек нужно сначала применить SQL-обновление базы данных.",
+    );
   }
 
-  const { error: updateError } = await supabase
-    .from("reports")
-    .update({ support_count: report.support_count + 1 })
-    .eq("id", reportId);
-
-  if (updateError) {
+  if (error && error.code !== "23505") {
     throw new Error("Не удалось поддержать заявку.");
   }
 
+  revalidatePath("/");
   revalidatePath("/reports");
   revalidatePath(`/reports/${reportId}`);
   revalidatePath("/my-reports");
+  revalidatePath("/map");
+  revalidatePath("/statistics");
 }
