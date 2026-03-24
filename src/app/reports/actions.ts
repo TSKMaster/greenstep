@@ -19,12 +19,6 @@ export async function supportReport(reportId: string) {
     user_id: user.id,
   });
 
-  if (error?.code === "42P01") {
-    throw new Error(
-      "Для защиты поддержек нужно сначала применить SQL-обновление базы данных.",
-    );
-  }
-
   if (error && error.code !== "23505") {
     throw new Error("Не удалось поддержать заявку.");
   }
