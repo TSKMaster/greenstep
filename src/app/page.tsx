@@ -169,7 +169,7 @@ export default async function Home() {
 
         <Link
           href="/reports/new"
-          className="mt-5 inline-flex w-full items-center justify-center rounded-[24px] bg-primary px-4 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-primary-dark"
+          className="mt-5 inline-flex w-full items-center justify-center rounded-[24px] bg-primary px-4 py-4 text-lg font-bold !text-white shadow-lg transition hover:bg-primary-dark"
         >
           Сообщить о проблеме
         </Link>
@@ -177,25 +177,25 @@ export default async function Home() {
         <section className="mt-4 grid grid-cols-2 gap-3">
           <Link
             href="/my-reports"
-            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold text-white shadow-md transition hover:bg-primary-dark"
+            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold !text-white shadow-md transition hover:bg-primary-dark"
           >
             Мои заявки
           </Link>
           <Link
             href="/statistics"
-            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold text-white shadow-md transition hover:bg-primary-dark"
+            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold !text-white shadow-md transition hover:bg-primary-dark"
           >
             Статистика
           </Link>
           <Link
             href="/reports"
-            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold text-white shadow-md transition hover:bg-primary-dark"
+            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold !text-white shadow-md transition hover:bg-primary-dark"
           >
             Все заявки
           </Link>
           <Link
             href="/map"
-            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold text-white shadow-md transition hover:bg-primary-dark"
+            className="rounded-[24px] bg-primary px-4 py-5 text-center text-base font-bold !text-white shadow-md transition hover:bg-primary-dark"
           >
             Карта
           </Link>

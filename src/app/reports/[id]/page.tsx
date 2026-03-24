@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { supportReport } from "@/app/reports/actions";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { supportReport } from "@/app/reports/actions";
 import type { ReportListItem } from "@/types";
 
 type ReportDetailsPageProps = {
@@ -37,7 +38,7 @@ export default async function ReportDetailsPage({
   const { data, error } = await supabase
     .from("reports")
     .select(
-      "id, address, admin_comment, category, created_at, description, is_anonymous, latitude, longitude, status, support_count",
+      "id, address, admin_comment, category, created_at, description, is_anonymous, latitude, longitude, photo_url, status, support_count",
     )
     .eq("id", id)
     .single();
@@ -67,6 +68,18 @@ export default async function ReportDetailsPage({
           </div>
           <ReportStatusBadge status={report.status} />
         </div>
+
+        {report.photo_url ? (
+          <div className="relative mt-6 h-72 overflow-hidden rounded-3xl border border-border bg-slate-950 sm:h-96">
+            <Image
+              src={report.photo_url}
+              alt="Фото заявки"
+              fill
+              unoptimized
+              className="object-contain"
+            />
+          </div>
+        ) : null}
 
         <div className="mt-6 rounded-3xl bg-surface-muted p-5 text-sm leading-7 text-foreground/80">
           <p>{report.description}</p>

@@ -17,7 +17,7 @@ export default async function MyReportsPage() {
   const { data, error } = await supabase
     .from("reports")
     .select(
-      "id, address, category, created_at, description, is_anonymous, status, support_count",
+      "id, address, category, created_at, description, is_anonymous, photo_url, status, support_count",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -46,7 +46,7 @@ export default async function MyReportsPage() {
 
           <Link
             href="/reports/new"
-            className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+            className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-3 font-semibold !text-white transition hover:bg-primary-dark"
           >
             Новая заявка
           </Link>

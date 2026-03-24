@@ -8,13 +8,22 @@ const STATUS_LABELS: Record<RequestStatus, string> = {
   rejected: "Отклонена",
 };
 
-const STATUS_CLASSES: Record<RequestStatus, string> = {
-  new: "bg-sky-100 text-sky-700",
-  accepted: "bg-amber-100 text-amber-700",
-  in_progress: "bg-violet-100 text-violet-700",
-  resolved: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-rose-100 text-rose-700",
-};
+function getStatusClassName(status: RequestStatus) {
+  switch (status) {
+    case "new":
+      return "bg-sky-600 text-white";
+    case "accepted":
+      return "bg-amber-500 text-white";
+    case "in_progress":
+      return "bg-violet-600 text-white";
+    case "resolved":
+      return "bg-emerald-600 text-white";
+    case "rejected":
+      return "bg-rose-600 text-white";
+    default:
+      return "bg-slate-600 text-white";
+  }
+}
 
 type ReportStatusBadgeProps = {
   status: RequestStatus;
@@ -23,7 +32,7 @@ type ReportStatusBadgeProps = {
 export function ReportStatusBadge({ status }: ReportStatusBadgeProps) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${STATUS_CLASSES[status]}`}
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClassName(status)}`}
     >
       {STATUS_LABELS[status]}
     </span>

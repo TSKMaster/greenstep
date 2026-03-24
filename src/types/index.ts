@@ -19,6 +19,7 @@ export type ReportInsert = {
   is_anonymous: boolean;
   latitude: number;
   longitude: number;
+  photo_url: string | null;
   user_id: string | null;
 };
 
@@ -31,6 +32,7 @@ export type ReportListItem = {
   is_anonymous: boolean;
   latitude: number;
   longitude: number;
+  photo_url?: string | null;
   admin_comment?: string | null;
   status: RequestStatus;
   support_count: number;

@@ -45,7 +45,7 @@ export default async function MapPage() {
 
           <Link
             href="/reports/new"
-            className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
+            className="inline-flex items-center justify-center rounded-2xl bg-primary px-4 py-3 font-semibold !text-white transition hover:bg-primary-dark"
           >
             Новая заявка
           </Link>

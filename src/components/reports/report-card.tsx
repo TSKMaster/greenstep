@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import type { ReportListItem } from "@/types";
@@ -30,6 +31,18 @@ export function ReportCard({ report }: ReportCardProps) {
         </div>
         <ReportStatusBadge status={report.status} />
       </div>
+
+      {report.photo_url ? (
+        <div className="relative mt-4 h-56 overflow-hidden rounded-3xl border border-border bg-slate-950 sm:h-72">
+          <Image
+            src={report.photo_url}
+            alt="Фото заявки"
+            fill
+            unoptimized
+            className="object-contain"
+          />
+        </div>
+      ) : null}
 
       <p className="mt-4 text-sm leading-6 text-foreground/80">
         {report.description}
