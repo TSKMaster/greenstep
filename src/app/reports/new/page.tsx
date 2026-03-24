@@ -23,8 +23,9 @@ export default async function NewReportPage() {
           Создание заявки
         </h1>
         <p className="mt-4 text-sm leading-6 text-foreground/80">
-          Это первая рабочая версия формы. Она уже сохраняет заявку в базу
-          данных Supabase.
+          Заполни форму, укажи точку на карте и, если нужно, прикрепи фото.
+          После отправки обращение сохранится в базе данных и появится в общем
+          списке заявок.
         </p>
         <ReportForm userId={user.id} />
         <Link
