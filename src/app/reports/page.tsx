@@ -1,8 +1,18 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ReportCard } from "@/components/reports/report-card";
+import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ReportListItem } from "@/types";
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
 
 export default async function ReportsPage() {
   const supabase = await createSupabaseServerClient();
@@ -16,16 +26,17 @@ export default async function ReportsPage() {
 
   const { data, error } = await supabase
     .from("reports")
-    .select(
-      "id, address, category, created_at, description, is_anonymous, photo_url, status, support_count",
-    )
+    .select("id, category, created_at, status")
     .order("created_at", { ascending: false });
 
   if (error) {
     throw new Error("Не удалось загрузить общий список заявок.");
   }
 
-  const reports = (data ?? []) as ReportListItem[];
+  const reports = (data ?? []) as Pick<
+    ReportListItem,
+    "id" | "category" | "created_at" | "status"
+  >[];
 
   return (
     <main className="min-h-screen px-6 py-10">
@@ -39,7 +50,8 @@ export default async function ReportsPage() {
               Все заявки
             </h1>
             <p className="mt-3 text-sm leading-6 text-foreground/80">
-              Здесь отображаются все обращения жителей района.
+              Здесь отображаются все обращения жителей района. Нажми на заявку,
+              чтобы открыть подробную карточку.
             </p>
           </div>
 
@@ -54,7 +66,23 @@ export default async function ReportsPage() {
         {reports.length > 0 ? (
           <div className="mt-8 grid gap-4">
             {reports.map((report) => (
-              <ReportCard key={report.id} report={report} />
+              <Link
+                key={report.id}
+                href={`/reports/${report.id}`}
+                className="rounded-3xl border border-border bg-white p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-primary-dark">
+                      {report.category}
+                    </h2>
+                    <p className="mt-2 text-sm text-foreground/70">
+                      Создано: {formatDate(report.created_at)}
+                    </p>
+                  </div>
+                  <ReportStatusBadge status={report.status} />
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
