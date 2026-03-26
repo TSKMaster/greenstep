@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { supportReport } from "@/app/reports/actions";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
+import { SupportReportButton } from "@/components/reports/support-report-button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ReportListItem } from "@/types";
 
@@ -58,7 +58,6 @@ export default async function ReportDetailsPage({
   const report = data as ReportListItem;
   const hasSupported = Boolean(supportRow);
   const isOwnReport = report.user_id === user.id;
-  const supportAction = supportReport.bind(null, report.id);
 
   return (
     <main className="min-h-screen px-6 py-10">
@@ -123,14 +122,7 @@ export default async function ReportDetailsPage({
               Ты уже поддержал это обращение
             </div>
           ) : (
-            <form action={supportAction} className="sm:flex-1">
-              <button
-                type="submit"
-                className="w-full rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark"
-              >
-                Поддержать обращение
-              </button>
-            </form>
+            <SupportReportButton reportId={report.id} />
           )}
 
           <Link

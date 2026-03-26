@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { updateReportAdminDetails } from "@/app/admin/actions";
+import { AdminReportForm } from "@/components/admin/admin-report-form";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import type { ReportListItem, RequestStatus } from "@/types";
@@ -57,7 +57,6 @@ export default async function AdminReportPage({
   }
 
   const report = data as ReportListItem;
-  const action = updateReportAdminDetails.bind(null, report.id);
 
   return (
     <main className="min-h-screen px-6 py-10">
@@ -103,49 +102,19 @@ export default async function AdminReportPage({
           </p>
         </div>
 
-        <form action={action} className="mt-6 grid gap-4 rounded-3xl border border-border bg-white p-5">
-          <label className="flex flex-col gap-2 text-sm text-foreground/80">
-            Статус
-            <select
-              name="status"
-              defaultValue={report.status}
-              className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
-            >
-              {STATUS_OPTIONS.map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
-          </label>
+        <AdminReportForm
+          adminComment={report.admin_comment ?? ""}
+          reportId={report.id}
+          status={report.status}
+          statusOptions={STATUS_OPTIONS}
+        />
 
-          <label className="flex flex-col gap-2 text-sm text-foreground/80">
-            Комментарий администратора
-            <textarea
-              name="admin_comment"
-              rows={4}
-              defaultValue={report.admin_comment ?? ""}
-              placeholder="Напиши комментарий по заявке"
-              className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
-            />
-          </label>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="submit"
-              className="rounded-2xl bg-primary px-4 py-3 font-semibold !text-white transition hover:bg-primary-dark sm:flex-1"
-            >
-              Сохранить изменения
-            </button>
-
-            <Link
-              href="/admin"
-              className="inline-flex items-center justify-center rounded-2xl border border-border px-4 py-3 font-semibold text-primary-dark transition hover:bg-surface-muted sm:flex-1"
-            >
-              Назад к списку заявок
-            </Link>
-          </div>
-        </form>
+        <Link
+          href="/admin"
+          className="mt-4 inline-flex items-center justify-center rounded-2xl border border-border px-4 py-3 font-semibold text-primary-dark transition hover:bg-surface-muted"
+        >
+          Назад к списку заявок
+        </Link>
 
         <Link
           href="/"

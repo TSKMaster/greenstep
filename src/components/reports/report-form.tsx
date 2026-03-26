@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReportLocationPickerLoader } from "@/components/reports/report-location-picker-loader";
 import { DEFAULT_MAP_CENTER, REPORT_CATEGORIES } from "@/lib/constants";
+import { getReportSubmissionErrorMessage } from "@/lib/error-messages";
 import {
   REPORT_DESCRIPTION_MAX_LENGTH,
   REPORT_DESCRIPTION_MIN_LENGTH,
@@ -109,7 +110,7 @@ export function ReportForm({ userId }: ReportFormProps) {
       });
 
     if (uploadError) {
-      throw new Error("Не удалось загрузить фото.");
+      throw new Error(getReportSubmissionErrorMessage(uploadError.message));
     }
 
     const {
@@ -154,7 +155,7 @@ export function ReportForm({ userId }: ReportFormProps) {
       const { error } = await supabase.from("reports").insert(payload);
 
       if (error) {
-        throw new Error("Не удалось сохранить заявку. Попробуй еще раз.");
+        throw new Error(getReportSubmissionErrorMessage(error.message));
       }
 
       router.push("/reports/success");
@@ -162,7 +163,7 @@ export function ReportForm({ userId }: ReportFormProps) {
     } catch (error) {
       setErrorMessage(
         error instanceof Error
-          ? error.message
+          ? getReportSubmissionErrorMessage(error.message)
           : "Не удалось отправить заявку. Попробуй еще раз.",
       );
       setIsSubmitting(false);

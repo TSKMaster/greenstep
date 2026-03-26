@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getAdminUpdateErrorMessage } from "@/lib/error-messages";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import type { RequestStatus } from "@/types";
 
@@ -13,13 +14,27 @@ const ALLOWED_STATUSES: RequestStatus[] = [
 ];
 
 export async function updateReportAdminDetails(
-  reportId: string,
+  _previousState: {
+    message: string;
+    status: "idle" | "success" | "error";
+  },
   formData: FormData,
 ) {
+  const reportId = formData.get("report_id");
   const { profile, supabase, user } = await getCurrentUserWithProfile();
 
+  if (typeof reportId !== "string" || !reportId) {
+    return {
+      message: "Не удалось определить заявку для редактирования.",
+      status: "error" as const,
+    };
+  }
+
   if (!user || !profile?.is_admin) {
-    throw new Error("Доступ к админке запрещен.");
+    return {
+      message: "Доступ к админке запрещен.",
+      status: "error" as const,
+    };
   }
 
   const status = formData.get("status");
@@ -29,7 +44,10 @@ export async function updateReportAdminDetails(
     typeof status !== "string" ||
     !ALLOWED_STATUSES.includes(status as RequestStatus)
   ) {
-    throw new Error("Передан неверный статус.");
+    return {
+      message: "Передан неверный статус.",
+      status: "error" as const,
+    };
   }
 
   const { error } = await supabase
@@ -42,7 +60,10 @@ export async function updateReportAdminDetails(
     .eq("id", reportId);
 
   if (error) {
-    throw new Error("Не удалось обновить заявку из админки.");
+    return {
+      message: getAdminUpdateErrorMessage(error.message),
+      status: "error" as const,
+    };
   }
 
   revalidatePath("/admin");
@@ -50,4 +71,9 @@ export async function updateReportAdminDetails(
   revalidatePath(`/reports/${reportId}`);
   revalidatePath("/statistics");
   revalidatePath("/my-reports");
+
+  return {
+    message: "Изменения по заявке сохранены.",
+    status: "success" as const,
+  };
 }

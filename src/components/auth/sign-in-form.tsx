@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getAuthErrorMessage } from "@/lib/error-messages";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function SignInForm() {
@@ -18,29 +19,30 @@ export function SignInForm() {
     const supabase = createSupabaseBrowserClient();
     const origin = window.location.origin;
     const redirectTo = `${origin}/auth/confirm`;
+    const normalizedEmail = email.trim().toLowerCase();
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email,
+        email: normalizedEmail,
         options: {
           emailRedirectTo: redirectTo,
         },
       });
 
       if (error) {
-        setErrorMessage(error.message);
+        setErrorMessage(getAuthErrorMessage(error.message));
         setIsSubmitting(false);
         return;
       }
 
       setSuccessMessage(
-        `Ссылка для входа отправлена на почту. Redirect URL: ${redirectTo}`,
+        `Ссылка для входа отправлена на ${normalizedEmail}. Если письма нет, проверь папки "Спам" и "Промоакции".`,
       );
     } catch (error) {
       setErrorMessage(
         error instanceof Error
-          ? error.message
-          : "Не удалось отправить ссылку для входа.",
+          ? getAuthErrorMessage(error.message)
+          : "Не удалось отправить ссылку для входа. Попробуй еще раз.",
       );
     } finally {
       setIsSubmitting(false);
@@ -55,7 +57,10 @@ export function SignInForm() {
           required
           type="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            setErrorMessage("");
+          }}
           placeholder="example@mail.com"
           className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
         />
