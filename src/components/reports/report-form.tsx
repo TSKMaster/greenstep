@@ -5,6 +5,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReportLocationPickerLoader } from "@/components/reports/report-location-picker-loader";
 import { DEFAULT_MAP_CENTER, REPORT_CATEGORIES } from "@/lib/constants";
+import {
+  REPORT_DESCRIPTION_MAX_LENGTH,
+  REPORT_DESCRIPTION_MIN_LENGTH,
+  type ReportFieldErrors,
+  validateReportForm,
+} from "@/lib/report-validation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ReportCategory, ReportInsert } from "@/types";
 
@@ -30,6 +36,7 @@ export function ReportForm({ userId }: ReportFormProps) {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<ReportFieldErrors>({});
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -57,22 +64,30 @@ export function ReportForm({ userId }: ReportFormProps) {
 
     if (!file) {
       setPhotoFile(null);
+      setFieldErrors((current) => ({ ...current, photo: undefined }));
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      setErrorMessage("Можно загрузить только изображение.");
+      setFieldErrors((current) => ({
+        ...current,
+        photo: "Можно загрузить только изображение.",
+      }));
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setErrorMessage("Фото должно быть не больше 5 МБ.");
+      setFieldErrors((current) => ({
+        ...current,
+        photo: "Фото должно быть не больше 5 МБ.",
+      }));
       event.target.value = "";
       return;
     }
 
     setErrorMessage("");
+    setFieldErrors((current) => ({ ...current, photo: undefined }));
     setPhotoFile(file);
   }
 
@@ -106,28 +121,32 @@ export function ReportForm({ userId }: ReportFormProps) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSubmitting(true);
     setErrorMessage("");
+    const validation = validateReportForm({
+      address,
+      description,
+      latitude,
+      longitude,
+    });
 
-    const parsedLatitude = Number(latitude);
-    const parsedLongitude = Number(longitude);
-
-    if (Number.isNaN(parsedLatitude) || Number.isNaN(parsedLongitude)) {
-      setErrorMessage("Координаты должны быть числами.");
-      setIsSubmitting(false);
+    if (!validation.data) {
+      setFieldErrors(validation.fieldErrors);
       return;
     }
+
+    setFieldErrors({});
+    setIsSubmitting(true);
 
     try {
       const supabase = createSupabaseBrowserClient();
       const photoUrl = await uploadPhoto();
       const payload: ReportInsert = {
-        address: address.trim() || null,
+        address: validation.data.address,
         category,
-        description: description.trim(),
+        description: validation.data.description,
         is_anonymous: isAnonymous,
-        latitude: parsedLatitude,
-        longitude: parsedLongitude,
+        latitude: validation.data.latitude,
+        longitude: validation.data.longitude,
         photo_url: photoUrl,
         user_id: userId,
       };
@@ -176,10 +195,24 @@ export function ReportForm({ userId }: ReportFormProps) {
           required
           rows={5}
           value={description}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={(event) => {
+            setDescription(event.target.value);
+            setFieldErrors((current) => ({ ...current, description: undefined }));
+          }}
           placeholder="Опиши проблему подробнее"
-          className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
+          className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
+            fieldErrors.description ? "border-red-400" : "border-border"
+          }`}
         />
+        <div className="flex items-start justify-between gap-3 text-xs">
+          <span className="text-red-700">{fieldErrors.description ?? ""}</span>
+          <span className="ml-auto whitespace-nowrap text-foreground/50">
+            {description.trim().length}/{REPORT_DESCRIPTION_MAX_LENGTH}
+          </span>
+        </div>
+        <p className="text-xs text-foreground/60">
+          Минимум {REPORT_DESCRIPTION_MIN_LENGTH} символов, чтобы было понятно, что произошло.
+        </p>
       </label>
 
       <label className="flex flex-col gap-2 text-sm text-foreground/80">
@@ -187,10 +220,18 @@ export function ReportForm({ userId }: ReportFormProps) {
         <input
           type="text"
           value={address}
-          onChange={(event) => setAddress(event.target.value)}
+          onChange={(event) => {
+            setAddress(event.target.value);
+            setFieldErrors((current) => ({ ...current, address: undefined }));
+          }}
           placeholder="Павлодар, район ТОЦ"
-          className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
+          className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
+            fieldErrors.address ? "border-red-400" : "border-border"
+          }`}
         />
+        {fieldErrors.address ? (
+          <p className="text-xs text-red-700">{fieldErrors.address}</p>
+        ) : null}
       </label>
 
       <div className="rounded-[28px] border border-border bg-surface-muted p-4">
@@ -220,10 +261,18 @@ export function ReportForm({ userId }: ReportFormProps) {
             required
             type="text"
             value={latitude}
-            onChange={(event) => setLatitude(event.target.value)}
+            onChange={(event) => {
+              setLatitude(event.target.value);
+              setFieldErrors((current) => ({ ...current, latitude: undefined }));
+            }}
             inputMode="decimal"
-            className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
+            className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
+              fieldErrors.latitude ? "border-red-400" : "border-border"
+            }`}
           />
+          {fieldErrors.latitude ? (
+            <p className="text-xs text-red-700">{fieldErrors.latitude}</p>
+          ) : null}
         </label>
 
         <label className="flex flex-col gap-2 text-sm text-foreground/80">
@@ -232,10 +281,18 @@ export function ReportForm({ userId }: ReportFormProps) {
             required
             type="text"
             value={longitude}
-            onChange={(event) => setLongitude(event.target.value)}
+            onChange={(event) => {
+              setLongitude(event.target.value);
+              setFieldErrors((current) => ({ ...current, longitude: undefined }));
+            }}
             inputMode="decimal"
-            className="rounded-2xl border border-border bg-white px-4 py-3 outline-none transition focus:border-primary"
+            className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
+              fieldErrors.longitude ? "border-red-400" : "border-border"
+            }`}
           />
+          {fieldErrors.longitude ? (
+            <p className="text-xs text-red-700">{fieldErrors.longitude}</p>
+          ) : null}
         </label>
       </div>
 
@@ -265,6 +322,9 @@ export function ReportForm({ userId }: ReportFormProps) {
             className="sr-only"
           />
         </label>
+        {fieldErrors.photo ? (
+          <p className="mt-3 text-sm text-red-700">{fieldErrors.photo}</p>
+        ) : null}
 
         {photoPreviewUrl ? (
           <div className="mt-4 overflow-hidden rounded-[24px] border border-border bg-white">
