@@ -22,6 +22,17 @@ type ReportFormProps = {
   userId: string;
 };
 
+function createUploadId() {
+  if (
+    typeof globalThis.crypto !== "undefined" &&
+    typeof globalThis.crypto.randomUUID === "function"
+  ) {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 function getFileExtension(file: File) {
   const parts = file.name.split(".");
   return parts.length > 1 ? parts.at(-1)?.toLowerCase() ?? "jpg" : "jpg";
@@ -99,7 +110,7 @@ export function ReportForm({ userId }: ReportFormProps) {
 
     const supabase = createSupabaseBrowserClient();
     const fileExtension = getFileExtension(photoFile);
-    const filePath = `${userId}/${crypto.randomUUID()}.${fileExtension}`;
+    const filePath = `${userId}/${createUploadId()}.${fileExtension}`;
 
     const { error: uploadError } = await supabase.storage
       .from(REPORT_PHOTOS_BUCKET)
@@ -110,7 +121,7 @@ export function ReportForm({ userId }: ReportFormProps) {
       });
 
     if (uploadError) {
-      throw new Error(getReportSubmissionErrorMessage(uploadError.message));
+      throw new Error(uploadError.message);
     }
 
     const {
@@ -123,6 +134,7 @@ export function ReportForm({ userId }: ReportFormProps) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
+
     const validation = validateReportForm({
       address,
       description,
@@ -140,6 +152,19 @@ export function ReportForm({ userId }: ReportFormProps) {
 
     try {
       const supabase = createSupabaseBrowserClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        throw new Error(authError.message);
+      }
+
+      if (!user) {
+        throw new Error("auth session missing");
+      }
+
       const photoUrl = await uploadPhoto();
       const payload: ReportInsert = {
         address: validation.data.address,
@@ -155,17 +180,26 @@ export function ReportForm({ userId }: ReportFormProps) {
       const { error } = await supabase.from("reports").insert(payload);
 
       if (error) {
-        throw new Error(getReportSubmissionErrorMessage(error.message));
+        throw new Error(error.message);
       }
 
       router.push("/reports/success");
       router.refresh();
     } catch (error) {
-      setErrorMessage(
+      console.error("Failed to submit report", error);
+
+      const fallbackMessage =
         error instanceof Error
           ? getReportSubmissionErrorMessage(error.message)
-          : "Не удалось отправить заявку. Попробуй еще раз.",
-      );
+          : "Не удалось отправить заявку. Попробуй еще раз.";
+      const detailedMessage =
+        process.env.NODE_ENV !== "production" &&
+        error instanceof Error &&
+        fallbackMessage === "Не удалось отправить заявку. Попробуй еще раз."
+          ? `${fallbackMessage} Причина: ${error.message}`
+          : fallbackMessage;
+
+      setErrorMessage(detailedMessage);
       setIsSubmitting(false);
       return;
     }
@@ -212,7 +246,8 @@ export function ReportForm({ userId }: ReportFormProps) {
           </span>
         </div>
         <p className="text-xs text-foreground/60">
-          Минимум {REPORT_DESCRIPTION_MIN_LENGTH} символов, чтобы было понятно, что произошло.
+          Минимум {REPORT_DESCRIPTION_MIN_LENGTH} символов, чтобы было понятно,
+          что произошло.
         </p>
       </label>
 
@@ -225,7 +260,7 @@ export function ReportForm({ userId }: ReportFormProps) {
             setAddress(event.target.value);
             setFieldErrors((current) => ({ ...current, address: undefined }));
           }}
-          placeholder="Павлодар, район ТОЦ"
+          placeholder="Павлодар, район ТД"
           className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
             fieldErrors.address ? "border-red-400" : "border-border"
           }`}

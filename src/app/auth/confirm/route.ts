@@ -1,13 +1,27 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+function getRequestOrigin(request: NextRequest) {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const host = forwardedHost ?? request.headers.get("host");
+  const protocol = forwardedProto ?? request.nextUrl.protocol.replace(":", "");
+
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+
+  return request.nextUrl.origin;
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const type = requestUrl.searchParams.get("type");
   const next = requestUrl.searchParams.get("next") ?? "/";
-  const redirectTo = new URL(next, request.url);
+  const origin = getRequestOrigin(request);
+  const redirectTo = new URL(next, origin);
   const supabase = await createSupabaseServerClient();
 
   if (code) {
@@ -29,5 +43,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL("/auth/error", request.url));
+  return NextResponse.redirect(new URL("/auth/error", origin));
 }

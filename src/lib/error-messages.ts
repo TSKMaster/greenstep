@@ -27,6 +27,15 @@ export function getAuthErrorMessage(message: string) {
 export function getReportSubmissionErrorMessage(message: string) {
   const normalized = normalizeMessage(message);
 
+  if (
+    normalized.includes("auth session missing") ||
+    normalized.includes("not authenticated") ||
+    normalized.includes("invalid jwt") ||
+    normalized.includes("jwt")
+  ) {
+    return "Сессия входа не найдена или истекла. Войди в приложение заново и повтори отправку.";
+  }
+
   if (normalized.includes("storage") || normalized.includes("photo")) {
     return "Не удалось загрузить фото. Попробуй другой файл или отправь заявку без фото.";
   }
@@ -40,6 +49,10 @@ export function getReportSubmissionErrorMessage(message: string) {
 
   if (normalized.includes("failed to fetch") || normalized.includes("network")) {
     return "Не удалось отправить заявку из-за проблемы с сетью. Попробуй еще раз.";
+  }
+
+  if (normalized.includes("randomuuid")) {
+    return "Не удалось подготовить фото для отправки в этом браузере. Попробуй выбрать фото заново или отправь заявку без фото.";
   }
 
   return "Не удалось отправить заявку. Попробуй еще раз.";
