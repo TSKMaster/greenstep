@@ -8,6 +8,10 @@ const STATUS_LABELS: Record<RequestStatus, string> = {
   rejected: "Отклонена",
 };
 
+export function getReportStatusLabel(status: RequestStatus) {
+  return STATUS_LABELS[status];
+}
+
 function getStatusClassName(status: RequestStatus) {
   switch (status) {
     case "new":
@@ -34,7 +38,7 @@ export function ReportStatusBadge({ status }: ReportStatusBadgeProps) {
     <span
       className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClassName(status)}`}
     >
-      {STATUS_LABELS[status]}
+      {getReportStatusLabel(status)}
     </span>
   );
 }

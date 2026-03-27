@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { icon } from "leaflet";
 import Link from "next/link";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { getReportStatusLabel } from "@/components/reports/report-status-badge";
 import { DEFAULT_MAP_CENTER } from "@/lib/constants";
 import type { ReportListItem } from "@/types";
 
@@ -65,7 +66,7 @@ export function ReportsMap({ reports }: ReportsMapProps) {
               <div className="space-y-2 text-sm">
                 <p className="font-semibold">{report.category}</p>
                 <p>{report.description}</p>
-                <p>Статус: {report.status}</p>
+                <p>Статус: {getReportStatusLabel(report.status)}</p>
                 <p>Поддержка: {report.support_count}</p>
                 <Link href={`/reports/${report.id}`} className="text-primary">
                   Открыть заявку
