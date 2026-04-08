@@ -54,3 +54,18 @@ select {
 .leaflet-container .leaflet-marker-shadow {
   max-width: none !important;
 }
+
+.preview-marker-cluster {
+  align-items: center;
+  background: radial-gradient(circle at 30% 30%, #a8e2b0, #2f8734);
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  box-shadow: 0 10px 18px rgba(47, 135, 52, 0.22);
+  color: #f7fbf3;
+  display: flex;
+  font-size: 13px;
+  font-weight: 700;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
