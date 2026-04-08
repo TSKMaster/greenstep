@@ -69,3 +69,115 @@ select {
   justify-content: center;
   width: 42px;
 }
+
+.preview-report-popup-shell .leaflet-popup-content-wrapper {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.preview-report-popup-shell .leaflet-popup-content {
+  margin: 0;
+}
+
+.preview-report-popup-shell .leaflet-popup-tip {
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(42, 73, 48, 0.12);
+}
+
+.preview-report-popup {
+  background: #ffffff;
+  border: 1px solid #d4e4d2;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(59, 94, 57, 0.12);
+  color: #173221;
+  min-width: 240px;
+  padding: 14px 14px 13px;
+}
+
+.preview-report-popup__eyebrow {
+  color: #5f8167;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.preview-report-popup__title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 6px 0 0;
+}
+
+.preview-report-popup__meta {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.preview-report-popup__status {
+  background: #ebf5e9;
+  border-radius: 999px;
+  color: #2f8d3f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 5px 8px;
+  text-transform: uppercase;
+}
+
+.preview-report-popup__support {
+  color: #5f8167;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.preview-report-popup__body {
+  color: #476051;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+
+.preview-report-popup__actions {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.preview-report-popup__link {
+  align-items: center;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 12px;
+  text-decoration: none;
+}
+
+.preview-report-popup__link--primary {
+  background: #2f8734;
+  color: #ffffff !important;
+}
+
+.preview-report-popup__link--primary:hover {
+  background: #286f2c;
+  color: #ffffff !important;
+}
+
+.preview-report-popup__link--ghost {
+  background: #f4f8f2;
+  border-color: #d4e4d2;
+  color: #23442d;
+}
+
+.preview-report-popup__link--ghost:hover {
+  background: #edf4ea;
+}

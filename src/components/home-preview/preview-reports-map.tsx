@@ -16,6 +16,62 @@ const markerIcon = icon({
   shadowSize: [41, 41],
 });
 
+function getStatusText(status: ReportListItem["status"]) {
+  switch (status) {
+    case "resolved":
+      return "Решено";
+    case "in_progress":
+      return "В работе";
+    case "accepted":
+      return "Принято";
+    case "rejected":
+      return "Отклонено";
+    default:
+      return "Новая";
+  }
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function buildPopupMarkup(report: ReportListItem, currentUserId: string | null) {
+  const title = escapeHtml(report.address || report.category);
+  const category = escapeHtml(report.category);
+  const status = escapeHtml(getStatusText(report.status));
+  const description = escapeHtml(report.description);
+  const shortDescription =
+    description.length > 110 ? `${description.slice(0, 107)}...` : description;
+  const detailsHref = `/reports/${report.id}`;
+  const isOwnReport = Boolean(currentUserId && report.user_id === currentUserId);
+  const actions = isOwnReport
+    ? `<a class="preview-report-popup__link preview-report-popup__link--primary" href="${detailsHref}">Перейти</a>`
+    : `
+      <div class="preview-report-popup__actions">
+        <a class="preview-report-popup__link preview-report-popup__link--ghost" href="${detailsHref}">Перейти</a>
+        <a class="preview-report-popup__link preview-report-popup__link--primary" href="${detailsHref}">Поддержать</a>
+      </div>
+    `;
+
+  return `
+    <div class="preview-report-popup">
+      <p class="preview-report-popup__eyebrow">${category}</p>
+      <h3 class="preview-report-popup__title">${title}</h3>
+      <div class="preview-report-popup__meta">
+        <span class="preview-report-popup__status">${status}</span>
+        <span class="preview-report-popup__support">Поддержка: ${report.support_count}</span>
+      </div>
+      <p class="preview-report-popup__body">${shortDescription}</p>
+      ${actions}
+    </div>
+  `;
+}
+
 function ResizeMapOnMount() {
   const map = useMap();
 
@@ -32,7 +88,7 @@ function ResizeMapOnMount() {
   return null;
 }
 
-function ClusteredMarkers({ reports }: PreviewReportsMapProps) {
+function ClusteredMarkers({ currentUserId, reports }: PreviewReportsMapProps) {
   const map = useMap();
 
   useEffect(() => {
@@ -59,6 +115,14 @@ function ClusteredMarkers({ reports }: PreviewReportsMapProps) {
         { icon: markerIcon },
       );
 
+      marker.bindPopup(buildPopupMarkup(report, currentUserId), {
+        className: "preview-report-popup-shell",
+        closeButton: false,
+        maxWidth: 280,
+        minWidth: 240,
+        offset: [0, -24],
+      });
+
       clusterGroup.addLayer(marker);
     });
 
@@ -68,16 +132,20 @@ function ClusteredMarkers({ reports }: PreviewReportsMapProps) {
       map.removeLayer(clusterGroup);
       clusterGroup.clearLayers();
     };
-  }, [map, reports]);
+  }, [currentUserId, map, reports]);
 
   return null;
 }
 
 type PreviewReportsMapProps = {
+  currentUserId: string | null;
   reports: ReportListItem[];
 };
 
-export function PreviewReportsMap({ reports }: PreviewReportsMapProps) {
+export function PreviewReportsMap({
+  currentUserId,
+  reports,
+}: PreviewReportsMapProps) {
   return (
     <div className="h-[464px] overflow-hidden rounded-[28px] border border-[#d4e4d2]">
       <MapContainer
@@ -91,7 +159,7 @@ export function PreviewReportsMap({ reports }: PreviewReportsMapProps) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <ClusteredMarkers reports={reports} />
+        <ClusteredMarkers currentUserId={currentUserId} reports={reports} />
       </MapContainer>
     </div>
   );

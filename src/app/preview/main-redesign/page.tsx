@@ -40,6 +40,7 @@ export default async function MainRedesignPage() {
   return (
     <MainRedesignPreview
       activeReports={activeReports}
+      currentUserId={user?.id ?? null}
       ecoIndex={ecoIndex}
       ecoLabel={ecoLabel}
       email={user?.email ?? profile?.email ?? "demo@greenstep.local"}

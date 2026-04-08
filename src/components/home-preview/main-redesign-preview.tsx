@@ -22,6 +22,7 @@ import type { ReportListItem } from "@/types";
 
 type MainRedesignPreviewProps = {
   activeReports: number;
+  currentUserId: string | null;
   ecoIndex: number;
   ecoLabel: string;
   email: string;
@@ -81,6 +82,7 @@ function getShortCategory(category: string) {
 
 export function MainRedesignPreview({
   activeReports,
+  currentUserId,
   ecoIndex,
   ecoLabel,
   email,
@@ -381,7 +383,7 @@ export function MainRedesignPreview({
               </div>
 
               <div className="mt-4">
-                <PreviewReportsMapLoader reports={reports} />
+                <PreviewReportsMapLoader currentUserId={currentUserId} reports={reports} />
               </div>
             </section>
 

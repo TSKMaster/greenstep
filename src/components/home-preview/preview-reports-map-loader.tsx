@@ -17,11 +17,13 @@ const PreviewReportsMap = dynamic(
 );
 
 type PreviewReportsMapLoaderProps = {
+  currentUserId: string | null;
   reports: ReportListItem[];
 };
 
 export function PreviewReportsMapLoader({
+  currentUserId,
   reports,
 }: PreviewReportsMapLoaderProps) {
-  return <PreviewReportsMap reports={reports} />;
+  return <PreviewReportsMap currentUserId={currentUserId} reports={reports} />;
 }
