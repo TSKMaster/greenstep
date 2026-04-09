@@ -4,8 +4,28 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { calculateEcoIndex, getEcoIndexLabel } from "@/lib/statistics";
 import type { ReportListItem } from "@/types";
 
-export default async function MainRedesignPage() {
+type MainRedesignPageProps = {
+  searchParams?: Promise<{
+    mode?: string;
+    report?: string;
+  }>;
+};
+
+export default async function MainRedesignPage({
+  searchParams,
+}: MainRedesignPageProps) {
   const { profile, user } = await getCurrentUserWithProfile();
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const modeParam = resolvedSearchParams?.mode;
+  const reportParam = resolvedSearchParams?.report ?? null;
+  const viewerMode =
+    modeParam === "guest"
+      ? "guest"
+      : modeParam === "auth"
+        ? "authorized"
+        : user
+          ? "authorized"
+          : "guest";
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
@@ -30,6 +50,15 @@ export default async function MainRedesignPage() {
   const resolvedReports = reports.filter(
     (report) => report.status === "resolved",
   ).length;
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const resolvedThisMonth = reports.filter((report) => {
+    if (report.status !== "resolved" || !report.created_at) {
+      return false;
+    }
+
+    return new Date(report.created_at) >= thirtyDaysAgo;
+  }).length;
   const myReports = reports.filter((report) => report.user_id === user?.id).length;
   const myResolvedReports = reports.filter(
     (report) => report.user_id === user?.id && report.status === "resolved",
@@ -44,13 +73,16 @@ export default async function MainRedesignPage() {
       ecoIndex={ecoIndex}
       ecoLabel={ecoLabel}
       email={user?.email ?? profile?.email ?? "demo@greenstep.local"}
+      initialSelectedReportId={reportParam}
       isAdmin={Boolean(profile?.is_admin)}
       myReports={myReports}
       myResolvedReports={myResolvedReports}
       rating={profile?.rating ?? 0}
       reports={reports}
       resolvedReports={resolvedReports}
+      resolvedThisMonth={resolvedThisMonth}
       totalReports={totalReports}
+      viewerMode={viewerMode}
     />
   );
 }

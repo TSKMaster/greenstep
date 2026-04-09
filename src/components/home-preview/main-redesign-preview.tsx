@@ -26,13 +26,16 @@ type MainRedesignPreviewProps = {
   ecoIndex: number;
   ecoLabel: string;
   email: string;
+  initialSelectedReportId: string | null;
   isAdmin: boolean;
   myReports: number;
   myResolvedReports: number;
   rating: number;
   reports: ReportListItem[];
   resolvedReports: number;
+  resolvedThisMonth: number;
   totalReports: number;
+  viewerMode: "guest" | "authorized";
 };
 
 type DemoArea = "challenge" | "community" | "nav";
@@ -53,31 +56,8 @@ function getGaugeStyle(value: number) {
   };
 }
 
-function getStatusText(value: string) {
-  switch (value) {
-    case "resolved":
-      return "Решено";
-    case "in_progress":
-      return "В работе";
-    case "accepted":
-      return "Принято";
-    case "rejected":
-      return "Отклонено";
-    default:
-      return "Новая";
-  }
-}
-
-function getShortCategory(category: string) {
-  if (category.includes("контейнер")) {
-    return "Контейнеры";
-  }
-
-  if (category.includes("свал")) {
-    return "Свалки";
-  }
-
-  return "Пункты сбора";
+function buildGuestReportHref(reportId: string) {
+  return `/preview/main-redesign?mode=guest&report=${encodeURIComponent(reportId)}`;
 }
 
 export function MainRedesignPreview({
@@ -86,17 +66,75 @@ export function MainRedesignPreview({
   ecoIndex,
   ecoLabel,
   email,
+  initialSelectedReportId,
   isAdmin,
   myReports,
   myResolvedReports,
   rating,
   reports,
   resolvedReports,
+  resolvedThisMonth,
   totalReports,
+  viewerMode,
 }: MainRedesignPreviewProps) {
   const [demoMessage, setDemoMessage] = useState<DemoMessage>(null);
-  const latestReports = reports.slice(0, 2);
   const communityActivityCount = Math.max(2, Math.min(totalReports, 9));
+  const isGuestView = viewerMode === "guest";
+  const selectedGuestReport =
+    reports.find((report) => report.id === initialSelectedReportId) ?? reports[0] ?? null;
+  const signInHref = "/auth/sign-in";
+  const primaryCtaHref = isGuestView ? signInHref : "/reports/new";
+  const guestMapExpandHref = selectedGuestReport
+    ? buildGuestReportHref(selectedGuestReport.id)
+    : "/preview/main-redesign?mode=guest";
+  const userBadgeInitial = email.trim().charAt(0).toLowerCase() || "g";
+  const switchModeHref = isGuestView
+    ? "/preview/main-redesign?mode=auth"
+    : "/preview/main-redesign?mode=guest";
+  const switchModeText = isGuestView
+    ? "Переключить на авторизованный сценарий"
+    : "Переключить на гостевой сценарий";
+  const reportSummaryItems = isGuestView
+    ? [
+        {
+          href: "/preview/main-redesign?mode=guest",
+          icon: <FileText size={22} className="text-[#2f8734]" strokeWidth={2} />,
+          label: "Всего заявок",
+          value: totalReports,
+        },
+        {
+          href: "/preview/main-redesign?mode=guest",
+          icon: <CheckCircle2 size={22} className="text-[#2f8734]" strokeWidth={2} />,
+          label: "Решено за 30 дней",
+          value: resolvedThisMonth,
+        },
+        {
+          href: "/preview/main-redesign?mode=guest",
+          icon: <Map size={22} className="text-[#2f8734]" strokeWidth={2} />,
+          label: "В работе",
+          value: activeReports,
+        },
+      ]
+    : [
+        {
+          href: "/reports",
+          icon: <FileText size={22} className="text-[#2f8734]" strokeWidth={2} />,
+          label: "Всего заявок",
+          value: totalReports,
+        },
+        {
+          href: "/my-reports",
+          icon: <FileText size={22} className="text-[#2f8734]" strokeWidth={2} />,
+          label: "Моих",
+          value: myReports,
+        },
+        {
+          href: "/my-reports",
+          icon: <CheckCircle2 size={22} className="text-[#2f8734]" strokeWidth={2} />,
+          label: "Моих решено",
+          value: myResolvedReports,
+        },
+      ];
 
   function openDemo(area: DemoArea, text: string) {
     setDemoMessage({ area, text });
@@ -110,6 +148,25 @@ export function MainRedesignPreview({
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(237,243,238,0.44),rgba(237,243,238,0.62))]" />
       <div className="relative z-10 mx-auto w-full max-w-[1440px]">
+        <section className="mb-3 flex items-center justify-between rounded-[24px] border border-[#cfe0cd] bg-white/90 px-4 py-3 shadow-[0_12px_24px_rgba(59,94,57,0.06)] backdrop-blur">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5e7965]">
+              Preview mode
+            </p>
+            <p className="mt-1 text-sm text-[#28452e]">
+              {isGuestView
+                ? "Гостевой сценарий: публичный просмотр, а действия ведут во вход."
+                : "Авторизованный сценарий: видны персональные блоки и рабочие CTA MVP."}
+            </p>
+          </div>
+          <Link
+            href={switchModeHref}
+            className="rounded-full border border-[#cfe0cd] bg-[#f3f7f1] px-4 py-2 text-sm font-semibold text-[#173221] transition hover:bg-[#edf4ea]"
+          >
+            {switchModeText}
+          </Link>
+        </section>
+
         <header className="rounded-[32px] border border-[#c9ddc7] bg-[#4f9663] px-4 py-2 shadow-[0_14px_30px_rgba(52,102,65,0.15)]">
           <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
             <div className="flex items-center justify-start">
@@ -159,7 +216,7 @@ export function MainRedesignPreview({
                     </div>
                     <div className="flex flex-col items-center justify-center text-center">
                       <p className="text-[8.5px] uppercase tracking-[0.12em] text-[#f0fbef]">
-                        Мероприятия
+                        Инициативы
                       </p>
                       <p className="mt-1 text-[19px] font-semibold leading-none">{resolvedReports}</p>
                     </div>
@@ -175,29 +232,51 @@ export function MainRedesignPreview({
             </div>
 
             <div className="flex items-center justify-end gap-2.5">
-              <div className="rounded-[18px] bg-white/14 px-3 py-1.5 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                <p className="text-[9px] uppercase tracking-[0.16em] text-[#dceadb]">
-                  {isAdmin ? "Администратор" : "Пользователь"}
-                </p>
-                <p className="mt-1 text-[12px] font-medium">{email}</p>
-                <p className="mt-1 text-[12px] font-semibold">{rating} баллов</p>
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  openDemo("nav", "Уведомления находятся в разработке.")
-                }
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
-              >
-                <Bell size={20} className="text-[#f7fbf3]" strokeWidth={2} />
-              </button>
-              <button
-                type="button"
-                onClick={() => openDemo("nav", "Сообщения находятся в разработке.")}
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
-              >
-                <MessageSquare size={20} className="text-[#f7fbf3]" strokeWidth={2} />
-              </button>
+              {isGuestView ? (
+                <>
+                  <Link
+                    href={signInHref}
+                    className="rounded-full border border-white/30 bg-white/14 px-4 py-2 text-sm font-semibold text-[#f7fbf3] transition hover:bg-white/20"
+                  >
+                    Вход
+                  </Link>
+                  <Link
+                    href={signInHref}
+                    className="rounded-full bg-[#f7fbf3] px-4 py-2 text-sm font-semibold text-[#1d5b2b] transition hover:bg-[#edf7ea]"
+                  >
+                    Регистрация
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="flex min-w-[220px] items-center gap-3 rounded-full bg-white/14 px-3 py-2 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#173221] text-[18px] font-semibold lowercase text-white">
+                      {userBadgeInitial}
+                    </div>
+                    <div className="min-w-0 leading-none">
+                      <p className="text-[9px] uppercase tracking-[0.14em] text-[#dceadb]">
+                        {isAdmin ? "Администратор" : "Пользователь"}
+                      </p>
+                      <p className="mt-1 truncate text-[12px] font-medium text-[#f7fbf3]">{email}</p>
+                      <p className="mt-1 text-[12px] text-[#e0eee0]">{rating} баллов</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openDemo("nav", "Уведомления находятся в разработке.")}
+                    className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
+                  >
+                    <Bell size={20} className="text-[#f7fbf3]" strokeWidth={2} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openDemo("nav", "Сообщения находятся в разработке.")}
+                    className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
+                  >
+                    <MessageSquare size={20} className="text-[#f7fbf3]" strokeWidth={2} />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </header>
@@ -236,9 +315,7 @@ export function MainRedesignPreview({
               <button
                 key={item as string}
                 type="button"
-                onClick={() =>
-                  openDemo("nav", `Раздел «${item as string}» находится в разработке.`)
-                }
+                onClick={() => openDemo("nav", `Раздел «${item as string}» находится в разработке.`)}
                 className="flex items-center rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-left text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
               >
                 <span className="flex items-center gap-3">
@@ -257,58 +334,39 @@ export function MainRedesignPreview({
                 <div>
                   <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
                     <FileText size={20} className="text-[#2f8734]" strokeWidth={2} />
-                    <span>Заявки</span>
+                    <span>{isGuestView ? "Пульс района" : "Заявки"}</span>
                   </h2>
+                  <p className="mt-2 text-sm text-[#587160]">
+                    {isGuestView
+                      ? "Публичная сводка по обращениям: видно масштаб, динамику и то, где нужна поддержка."
+                      : "Персональная панель по обращениям и вашему прогрессу в GreenStep."}
+                  </p>
                 </div>
               </div>
 
               <div className="mt-3 space-y-2.5">
-                <Link
-                  href="/reports"
-                  className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-3 text-[#173221] transition hover:bg-[#edf4ea]"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-12 w-12 place-items-center rounded-[15px] bg-white text-[#2f8734] shadow-sm">
-                      <FileText size={22} className="text-[#2f8734]" strokeWidth={2} />
-                    </span>
-                    <span className="text-[14px] font-medium">Всего заявок</span>
-                  </div>
-                  <p className="text-[35px] font-semibold leading-none tracking-[-0.05em] text-[#12351d]">
-                    {totalReports}
-                  </p>
-                </Link>
-                <Link
-                  href="/my-reports"
-                  className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-3 text-[#173221] transition hover:bg-[#edf4ea]"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-12 w-12 place-items-center rounded-[15px] bg-white text-[#2f8734] shadow-sm">
-                      <FileText size={22} className="text-[#2f8734]" strokeWidth={2} />
-                    </span>
-                    <span className="text-[14px] font-medium">Моих</span>
-                  </div>
-                  <p className="text-[35px] font-semibold leading-none tracking-[-0.05em] text-[#12351d]">
-                    {myReports}
-                  </p>
-                </Link>
-                <Link
-                  href="/my-reports"
-                  className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-3 text-[#173221] transition hover:bg-[#edf4ea]"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-12 w-12 place-items-center rounded-[15px] bg-white text-[#2f8734] shadow-sm">
-                      <CheckCircle2 size={22} className="text-[#2f8734]" strokeWidth={2} />
-                    </span>
-                    <span className="text-[14px] font-medium">Моих решено</span>
-                  </div>
-                  <p className="text-[35px] font-semibold leading-none tracking-[-0.05em] text-[#12351d]">
-                    {myResolvedReports}
-                  </p>
-                </Link>
+                {reportSummaryItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-3 text-[#173221] transition hover:bg-[#edf4ea]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-12 w-12 place-items-center rounded-[15px] bg-white text-[#2f8734] shadow-sm">
+                        {item.icon}
+                      </span>
+                      <span className="text-[14px] font-medium">{item.label}</span>
+                    </div>
+                    <p className="text-[35px] font-semibold leading-none tracking-[-0.05em] text-[#12351d]">
+                      {item.value}
+                    </p>
+                  </Link>
+                ))}
               </div>
+
             </section>
 
-            <section className="min-h-[330px] rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-3 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
+            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-3 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
                   <Users size={20} className="text-[#2f8734]" strokeWidth={2} />
@@ -318,45 +376,56 @@ export function MainRedesignPreview({
                   {communityActivityCount} актив.
                 </div>
               </div>
-              <div className="mt-2 rounded-[18px] bg-[#f3f7f1] px-4 py-2">
-                <p className="text-[13px] leading-5 font-medium text-[#23442d]">
-                  В фокусе: локальные инициативы рядом с активными точками.
+              {!isGuestView ? (
+                <p className="mt-2 text-[13px] font-medium uppercase tracking-[0.08em] text-[#6b7f71]">
+                  ТОП-3 обсуждений:
                 </p>
-              </div>
+              ) : null}
+              {isGuestView ? (
+                <div className="mt-2 rounded-[18px] bg-[#f3f7f1] px-4 py-2">
+                  <p className="text-[13px] leading-5 font-medium text-[#23442d]">
+                    В фокусе: кто уже двигает район вперёд и какие инициативы собирают соседей.
+                  </p>
+                </div>
+              ) : null}
               <div className="mt-2.5 space-y-2">
-                {[...latestReports, ...reports.slice(2, 3)].slice(0, 1).map((report) => (
-                  <button
-                    key={report.id}
-                    type="button"
-                    onClick={() =>
-                      openDemo(
-                        "community",
-                        `Карточка «${getShortCategory(report.category)}» пока открывает demo-сообщение.`,
-                      )
-                    }
-                    className="flex w-full items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-2.5 text-left transition hover:bg-[#edf4ea]"
-                  >
-                    <div>
-                      <p className="text-[17px] font-semibold leading-5 text-[#12351d]">
-                        {report.address ?? getShortCategory(report.category)}
-                      </p>
-                      <p className="mt-1 text-[14px] leading-5 text-[#5d7361]">
-                        {getStatusText(report.status)} · соседи следят за обновлениями
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2f8d3f]">
-                      Обсуждение
-                    </span>
-                  </button>
-                ))}
+                {isGuestView ? (
+                  <>
+                    {[
+                      ["Айша", "420 баллов", "Запустила сортировку пластика у трёх домов"],
+                      ["Тимур", "365 баллов", "Собрал соседей на весеннюю уборку двора"],
+                      ["Салтанат", "310 баллов", "Следит за обновлениями по обращениям района"],
+                    ].map(([name, score, text]) => (
+                      <div key={name} className="rounded-[18px] bg-[#f3f7f1] px-4 py-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[16px] font-semibold text-[#12351d]">{name}</p>
+                          <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2f8d3f]">
+                            {score}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-[14px] leading-5 text-[#5d7361]">{text}</p>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {[
+                      "Высадка деревьев у школы",
+                      "Субботник у набережной",
+                      "Как улучшить точки сбора?",
+                    ].map((title) => (
+                      <div key={title} className="rounded-[18px] bg-[#f3f7f1] px-4 py-3">
+                        <p className="text-[16px] font-semibold text-[#12351d]">{title}</p>
+                      </div>
+                    ))}
+                  </>
+                )}
                 <button
                   type="button"
-                  onClick={() =>
-                    openDemo("community", "Инициативы сообщества находятся в разработке.")
-                  }
-                  className="w-full rounded-[18px] border border-[#d4e4d2] bg-white px-4 py-2 text-[15px] font-medium text-[#28452e] transition hover:bg-[#f6faf5]"
+                  onClick={() => openDemo("community", "Инициативы сообщества находятся в разработке.")}
+                  className="mx-auto flex w-fit rounded-[18px] border border-[#d4e4d2] bg-white px-5 py-1.5 text-[14px] font-medium text-[#6b6659] transition hover:bg-[#f6faf5]"
                 >
-                  Предложить инициативу
+                  {isGuestView ? "Предложить инициативу" : "Предложить инициативу"}
                 </button>
               </div>
             </section>
@@ -371,94 +440,143 @@ export function MainRedesignPreview({
                     <span>Карта района</span>
                   </h2>
                   <p className="mt-2 text-sm text-[#587160]">
-                    Реальные заявки проекта на карте с demo-фильтрами
+                    {isGuestView
+                      ? "Гость видит публичную карту района и может открыть выбранную заявку в preview-детали."
+                      : "Реальные заявки проекта на карте с demo-фильтрами"}
                   </p>
                 </div>
                 <Link
-                  href="/map"
+                  href={isGuestView ? guestMapExpandHref : "/map"}
                   className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
                 >
-                  Развернуть карту
+                  {isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
                 </Link>
               </div>
 
               <div className="mt-4">
-                <PreviewReportsMapLoader currentUserId={currentUserId} reports={reports} />
+                <PreviewReportsMapLoader currentUserId={isGuestView ? null : currentUserId} reports={reports} />
               </div>
             </section>
 
             <Link
-              href="/reports/new"
+              href={primaryCtaHref}
               className="mt-1 inline-flex w-full items-center justify-center rounded-[22px] bg-[#2f8734] px-5 py-5 text-[17px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.28)] transition hover:bg-[#286f2c]"
               style={{ color: "#ffffff" }}
             >
-              Сообщить о проблеме
+              {isGuestView ? "Войти, чтобы отправить заявку" : "Сообщить о проблеме"}
             </Link>
           </div>
 
           <div className="flex min-h-[760px] flex-col gap-3">
-            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-              <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
-                <span>Статистика</span>
-              </h2>
-              <p className="mt-2 text-sm text-[#587160]">
-                Смешение реальных и demo-метрик
-              </p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                {[
-                  ["Качество воздуха", "72%"],
-                  ["Переработка", "18 т"],
-                  ["Обращения", String(activeReports)],
-                  ["Динамика", "+12%"],
-                ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="rounded-[18px] bg-[#f3f7f1] px-4 py-4"
-                  >
-                    <p className="text-[12px] uppercase tracking-[0.12em] text-[#6c8770]">{label}</p>
-                    <p className="mt-2.5 text-[29px] font-semibold leading-none tracking-[-0.03em] text-[#12351d]">
-                      {value}
-                    </p>
+            {isGuestView ? (
+              <>
+                <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
+                  <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
+                    <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
+                    <span>Обзор района</span>
+                  </h2>
+                  <p className="mt-2 text-sm text-[#587160]">
+                    Публичный срез для гостя: видно темп района, текущую нагрузку и куда сейчас смотрят соседи.
+                  </p>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    {[
+                      ["Активных точек", String(activeReports)],
+                      ["Решено за месяц", String(resolvedThisMonth)],
+                      ["Поддержек", String(selectedGuestReport?.support_count ?? 0)],
+                      ["Эко-индекс", String(ecoIndex)],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-[18px] bg-[#f3f7f1] px-4 py-4">
+                        <p className="text-[12px] uppercase tracking-[0.12em] text-[#6c8770]">{label}</p>
+                        <p className="mt-2.5 text-[29px] font-semibold leading-none tracking-[-0.03em] text-[#12351d]">
+                          {value}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
+                </section>
+
+              </>
+            ) : (
+              <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
+                <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
+                  <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
+                  <span>Статистика</span>
+                </h2>
+                <p className="mt-2 text-sm text-[#587160]">
+                  Смешение реальных и demo-метрик
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {[
+                    ["Качество воздуха", "72%"],
+                    ["Переработка", "18 т"],
+                    ["Обращения", String(activeReports)],
+                    ["Динамика", "+12%"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-[18px] bg-[#f3f7f1] px-4 py-4">
+                      <p className="text-[12px] uppercase tracking-[0.12em] text-[#6c8770]">{label}</p>
+                      <p className="mt-2.5 text-[29px] font-semibold leading-none tracking-[-0.03em] text-[#12351d]">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
               <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
                 <Trophy size={20} className="text-[#2f8734]" strokeWidth={2} />
-                <span>Челлендж</span>
+                <span>{isGuestView ? "Челленджи района" : "Челлендж"}</span>
               </h2>
-              <p className="mt-2 text-sm text-[#587160]">Короткий demo-челлендж</p>
+              <p className="mt-2 text-sm text-[#587160]">
+                {isGuestView
+                  ? "Promo-слой для конкурсного MVP: участие открывается после входа, а витрина помогает почувствовать активность района."
+                  : "Короткий demo-челлендж"}
+              </p>
               <h3 className="mt-3 text-[16px] font-semibold text-[#12351d]">
-                7 дней без лишнего пластика
+                {isGuestView ? "Неделя соседских экопривычек" : "7 дней без лишнего пластика"}
               </h3>
               <p className="mt-2 text-sm leading-6 text-[#4f6856]">
-                Выполнено 5 из 7 дней. Награда после завершения.
+                {isGuestView
+                  ? "Жители выбирают простые действия на неделю: сортировка дома, отказ от одноразового пластика и поддержка локальных заявок."
+                  : "Выполнено 5 из 7 дней. Награда после завершения."}
               </p>
               <div className="mt-4 h-3 rounded-full bg-[#e2ebdf]">
-                <div className="h-full w-[72%] rounded-full bg-[#2f8734]" />
+                <div
+                  className={`h-full rounded-full bg-[#2f8734] ${isGuestView ? "w-[58%]" : "w-[72%]"}`}
+                />
               </div>
               <div className="mt-4 flex items-center justify-between rounded-[20px] bg-[#f3f7f1] px-4 py-4">
                 <div>
-                  <p className="text-[15px] font-medium text-[#173221]">Превью награды</p>
-                  <p className="mt-1 text-sm text-[#6b7f71]">Эко-значок активиста</p>
+                  <p className="text-[15px] font-medium text-[#173221]">
+                    {isGuestView ? "Уже участвуют 24 соседа" : "Превью награды"}
+                  </p>
+                  <p className="mt-1 text-sm text-[#6b7f71]">
+                    {isGuestView
+                      ? "Вход откроет участие, историю прогресса и персональные награды."
+                      : "Эко-значок активиста"}
+                  </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    openDemo("challenge", "Раздел с наградами находится в разработке.")
-                  }
-                  className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
-                >
-                  Подробнее
-                </button>
+                {isGuestView ? (
+                  <Link
+                    href={signInHref}
+                    className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+                  >
+                    Хочу участвовать
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openDemo("challenge", "Раздел с наградами находится в разработке.")}
+                    className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+                  >
+                    Подробнее
+                  </button>
+                )}
               </div>
             </section>
           </div>
         </section>
-
       </div>
     </main>
   );

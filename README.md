@@ -1,5 +1,11 @@
 # GreenStep
 
+## Preview Main Redesign Notes
+
+- `/preview/main-redesign` now supports two safe desktop scenarios for iteration: `?mode=guest` and `?mode=auth`
+- guest preview follows `GUEST_HOME_SPEC.md`: public summary on the left, promo/demo community blocks, and auth-gated CTA for key actions
+- redesign experiments for the main page still stay in preview only until a separate transfer decision is made
+
 GreenStep — конкурсный `MVP` web-приложения для повышения экологической ответственности жителей района.
 
 ## Что делаем

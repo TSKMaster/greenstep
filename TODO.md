@@ -1,5 +1,13 @@
 # GreenStep TODO
 
+## April 2026 Notes
+
+- [x] Preview main redesign: added `guest/auth` split on `/preview/main-redesign` with `?mode=guest` and `?mode=auth`
+- [x] Preview guest flow now uses public summary blocks and auth-gated CTA instead of pretending guest actions are fully available
+- [x] Preview guest flow now has a public `?report=` spotlight path so map/detail interactions stay inside preview instead of jumping to real report pages
+- [x] Guest preview empty state checked in browser with fresh screenshot when there are no reports in Supabase
+- [x] README / PROJECT_CONTEXT updated after the preview guest/auth task
+
 Этот файл нужен как рабочий чеклист по проекту.
 Отмечаем выполненные пункты по мере движения: `[x]` выполнено, `[ ]` впереди.
 

@@ -1,5 +1,14 @@
 # GreenStep Project Context
 
+## Preview Guest/Auth Update
+
+- `/preview/main-redesign` now has explicit `guest/auth` preview modes via `?mode=guest` and `?mode=auth`
+- the guest preview branch already follows the current `GUEST_HOME_SPEC.md` direction: guest header, public summary, promo/demo side blocks, and auth-gated CTA
+- the preview map popup also respects guest mode now: support CTA sends the user to sign-in instead of pretending the action is fully open
+- guest preview now also supports a public spotlight flow via `?report=<id>` so map interactions can stay inside preview instead of jumping into real auth-gated report pages
+- if Supabase has zero reports, the guest spotlight intentionally shows an empty state; this is expected for preview validation and should not be mistaken for a rendering bug
+- after this point, visual checks for guest-home work should be run in both preview modes, with fresh screenshots after noticeable changes
+
 ## Что это за проект
 
 `GreenStep` — конкурсный `MVP` web-приложения для жителей района.
@@ -144,6 +153,7 @@
 - `TODO.md` — если меняются задачи и приоритеты
 - `DATABASE_SIMPLE.md` — если меняется база данных
 - `PROJECT_CONTEXT.md` — если меняется этап проекта, договоренности или важные решения
+- `GUEST_HOME_SPEC.md` — если меняется логика гостевой главной страницы, разделение `guest/auth` или состав публичных и demo-блоков
 
 ## Что пока сознательно не делаем
 
@@ -188,7 +198,11 @@
 ## Как использовать этот файл в новом чате
 
 Можно просто написать:
-
+ 
 `Прочитай PROJECT_CONTEXT.md, TODO.md и README.md, а потом помоги мне с текущей задачей`.
 
 Этого обычно достаточно, чтобы быстро восстановить рабочий контекст.
+
+Если задача связана с публичной главной страницей и логикой для неавторизованного пользователя, дополнительно стоит читать:
+
+`GUEST_HOME_SPEC.md`
