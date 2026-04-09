@@ -162,7 +162,7 @@ export function PreviewReportsMap({
   reports,
 }: PreviewReportsMapProps) {
   return (
-    <div className="h-[464px] overflow-hidden rounded-[28px] border border-[#d4e4d2]">
+    <div className="h-[420px] overflow-hidden rounded-[28px] border border-[#d4e4d2]">
       <MapContainer
         center={[DEFAULT_MAP_CENTER.lat, DEFAULT_MAP_CENTER.lng]}
         zoom={15}

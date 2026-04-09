@@ -13,7 +13,6 @@ import {
   Leaf,
   ListTodo,
   Map,
-  MessageSquare,
   Trophy,
   Users,
 } from "lucide-react";
@@ -44,6 +43,14 @@ type DemoMessage = {
   area: DemoArea;
   text: string;
 } | null;
+
+function DemoBadge({ label = "Demo" }: { label?: string }) {
+  return (
+    <span className="rounded-full border border-[#d7e5d5] bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6c8770]">
+      {label}
+    </span>
+  );
+}
 
 function getGaugeStyle(value: number) {
   return {
@@ -78,22 +85,16 @@ export function MainRedesignPreview({
   viewerMode,
 }: MainRedesignPreviewProps) {
   const [demoMessage, setDemoMessage] = useState<DemoMessage>(null);
-  const communityActivityCount = Math.max(2, Math.min(totalReports, 9));
   const isGuestView = viewerMode === "guest";
   const selectedGuestReport =
     reports.find((report) => report.id === initialSelectedReportId) ?? reports[0] ?? null;
   const signInHref = "/auth/sign-in";
   const primaryCtaHref = isGuestView ? signInHref : "/reports/new";
+  const secondaryCtaHref = isGuestView ? signInHref : "/my-reports";
   const guestMapExpandHref = selectedGuestReport
     ? buildGuestReportHref(selectedGuestReport.id)
     : "/preview/main-redesign?mode=guest";
   const userBadgeInitial = email.trim().charAt(0).toLowerCase() || "g";
-  const switchModeHref = isGuestView
-    ? "/preview/main-redesign?mode=auth"
-    : "/preview/main-redesign?mode=guest";
-  const switchModeText = isGuestView
-    ? "Переключить на авторизованный сценарий"
-    : "Переключить на гостевой сценарий";
   const reportSummaryItems = isGuestView
     ? [
         {
@@ -148,25 +149,6 @@ export function MainRedesignPreview({
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(237,243,238,0.44),rgba(237,243,238,0.62))]" />
       <div className="relative z-10 mx-auto w-full max-w-[1440px]">
-        <section className="mb-3 flex items-center justify-between rounded-[24px] border border-[#cfe0cd] bg-white/90 px-4 py-3 shadow-[0_12px_24px_rgba(59,94,57,0.06)] backdrop-blur">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#5e7965]">
-              Preview mode
-            </p>
-            <p className="mt-1 text-sm text-[#28452e]">
-              {isGuestView
-                ? "Гостевой сценарий: публичный просмотр, а действия ведут во вход."
-                : "Авторизованный сценарий: видны персональные блоки и рабочие CTA MVP."}
-            </p>
-          </div>
-          <Link
-            href={switchModeHref}
-            className="rounded-full border border-[#cfe0cd] bg-[#f3f7f1] px-4 py-2 text-sm font-semibold text-[#173221] transition hover:bg-[#edf4ea]"
-          >
-            {switchModeText}
-          </Link>
-        </section>
-
         <header className="rounded-[32px] border border-[#c9ddc7] bg-[#4f9663] px-4 py-2 shadow-[0_14px_30px_rgba(52,102,65,0.15)]">
           <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
             <div className="flex items-center justify-start">
@@ -268,13 +250,6 @@ export function MainRedesignPreview({
                   >
                     <Bell size={20} className="text-[#f7fbf3]" strokeWidth={2} />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => openDemo("nav", "Сообщения находятся в разработке.")}
-                    className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
-                  >
-                    <MessageSquare size={20} className="text-[#f7fbf3]" strokeWidth={2} />
-                  </button>
                 </>
               )}
             </div>
@@ -300,12 +275,13 @@ export function MainRedesignPreview({
             </Link>
             <Link
               href="/statistics"
-              className="flex items-center rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
+              className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
             >
               <span className="flex items-center gap-3">
                 <BarChart3 size={20} className="text-[#173221]" strokeWidth={2} />
                 <span>Статистика</span>
               </span>
+              <DemoBadge />
             </Link>
             {[
               ["Задания", <ListTodo key="tasks" size={20} className="text-[#173221]" strokeWidth={2} />],
@@ -316,12 +292,13 @@ export function MainRedesignPreview({
                 key={item as string}
                 type="button"
                 onClick={() => openDemo("nav", `Раздел «${item as string}» находится в разработке.`)}
-                className="flex items-center rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-left text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
+                className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-left text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
               >
                 <span className="flex items-center gap-3">
                   {iconNode}
                   <span>{item as string}</span>
                 </span>
+                <DemoBadge />
               </button>
             ))}
           </div>
@@ -363,7 +340,6 @@ export function MainRedesignPreview({
                   </Link>
                 ))}
               </div>
-
             </section>
 
             <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-3 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
@@ -372,9 +348,7 @@ export function MainRedesignPreview({
                   <Users size={20} className="text-[#2f8734]" strokeWidth={2} />
                   <span>Сообщество</span>
                 </h2>
-                <div className="rounded-full bg-[#ebf5e9] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#2f8d3f]">
-                  {communityActivityCount} актив.
-                </div>
+                <DemoBadge />
               </div>
               {!isGuestView ? (
                 <p className="mt-2 text-[13px] font-medium uppercase tracking-[0.08em] text-[#6b7f71]">
@@ -425,56 +399,93 @@ export function MainRedesignPreview({
                   onClick={() => openDemo("community", "Инициативы сообщества находятся в разработке.")}
                   className="mx-auto flex w-fit rounded-[18px] border border-[#d4e4d2] bg-white px-5 py-1.5 text-[14px] font-medium text-[#6b6659] transition hover:bg-[#f6faf5]"
                 >
-                  {isGuestView ? "Предложить инициативу" : "Предложить инициативу"}
+                  Предложить инициативу
                 </button>
               </div>
             </section>
           </div>
 
           <div className="flex min-h-[760px] flex-col gap-3">
-            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                    <Map size={20} className="text-[#2f8734]" strokeWidth={2} />
-                    <span>Карта района</span>
-                  </h2>
-                  <p className="mt-2 text-sm text-[#587160]">
-                    {isGuestView
-                      ? "Гость видит публичную карту района и может открыть выбранную заявку в preview-детали."
-                      : "Реальные заявки проекта на карте с demo-фильтрами"}
-                  </p>
+            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-5 py-5 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
+              <h1 className="max-w-[620px] text-[34px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#12351d]">
+                Экологические обращения района
+              </h1>
+              <p className="mt-3 max-w-[620px] text-[16px] leading-7 text-[#587160]">
+                Сообщайте о проблемах на карте, прикрепляйте фото и отслеживайте статус обращения.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <Link
+                  href={primaryCtaHref}
+                  className="inline-flex items-center justify-center rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c]"
+                  style={{ color: "#ffffff" }}
+                >
+                  Сообщить о проблеме
+                </Link>
+                <Link
+                  href={secondaryCtaHref}
+                  className="inline-flex items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-6 py-3 text-[15px] font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+                >
+                  Список заявок
+                </Link>
+                <div className="inline-flex items-center rounded-full border border-[#cfe0cd] bg-[#f3f7f1] p-1">
+                  <Link
+                    href="/preview/main-redesign?mode=guest"
+                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      isGuestView
+                        ? "bg-white text-[#173221] shadow-sm"
+                        : "text-[#6a7d6d] hover:text-[#173221]"
+                    }`}
+                  >
+                    Гость
+                  </Link>
+                  <Link
+                    href="/preview/main-redesign?mode=auth"
+                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      !isGuestView
+                        ? "bg-white text-[#173221] shadow-sm"
+                        : "text-[#6a7d6d] hover:text-[#173221]"
+                    }`}
+                  >
+                    Авторизован
+                  </Link>
                 </div>
+              </div>
+            </section>
+
+            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
+              <div>
+                <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
+                  <Map size={20} className="text-[#2f8734]" strokeWidth={2} />
+                  <span>Карта обращений района</span>
+                </h2>
+              </div>
+
+              <div className="relative mt-4">
+                <PreviewReportsMapLoader
+                  currentUserId={isGuestView ? null : currentUserId}
+                  reports={reports}
+                />
                 <Link
                   href={isGuestView ? guestMapExpandHref : "/map"}
-                  className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+                  className="absolute right-5 bottom-5 z-[700] rounded-full border border-[#d4e4d2] bg-white/96 px-4 py-2 text-sm font-semibold text-[#28452e] shadow-sm transition hover:bg-[#f6faf5]"
                 >
                   {isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
                 </Link>
               </div>
-
-              <div className="mt-4">
-                <PreviewReportsMapLoader currentUserId={isGuestView ? null : currentUserId} reports={reports} />
-              </div>
             </section>
-
-            <Link
-              href={primaryCtaHref}
-              className="mt-1 inline-flex w-full items-center justify-center rounded-[22px] bg-[#2f8734] px-5 py-5 text-[17px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.28)] transition hover:bg-[#286f2c]"
-              style={{ color: "#ffffff" }}
-            >
-              {isGuestView ? "Войти, чтобы отправить заявку" : "Сообщить о проблеме"}
-            </Link>
           </div>
 
           <div className="flex min-h-[760px] flex-col gap-3">
             {isGuestView ? (
               <>
                 <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-                  <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                    <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
-                    <span>Обзор района</span>
-                  </h2>
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
+                      <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
+                      <span>Обзор района</span>
+                    </h2>
+                    <DemoBadge />
+                  </div>
                   <p className="mt-2 text-sm text-[#587160]">
                     Публичный срез для гостя: видно темп района, текущую нагрузку и куда сейчас смотрят соседи.
                   </p>
@@ -494,14 +505,16 @@ export function MainRedesignPreview({
                     ))}
                   </div>
                 </section>
-
               </>
             ) : (
               <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-                <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                  <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
-                  <span>Статистика</span>
-                </h2>
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
+                    <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
+                    <span>Статистика</span>
+                  </h2>
+                  <DemoBadge />
+                </div>
                 <p className="mt-2 text-sm text-[#587160]">
                   Смешение реальных и demo-метрик
                 </p>
@@ -524,10 +537,13 @@ export function MainRedesignPreview({
             )}
 
             <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-              <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                <Trophy size={20} className="text-[#2f8734]" strokeWidth={2} />
-                <span>{isGuestView ? "Челленджи района" : "Челлендж"}</span>
-              </h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
+                  <Trophy size={20} className="text-[#2f8734]" strokeWidth={2} />
+                  <span>{isGuestView ? "Челленджи района" : "Челлендж"}</span>
+                </h2>
+                <DemoBadge />
+              </div>
               <p className="mt-2 text-sm text-[#587160]">
                 {isGuestView
                   ? "Promo-слой для конкурсного MVP: участие открывается после входа, а витрина помогает почувствовать активность района."

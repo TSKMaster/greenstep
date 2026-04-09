@@ -11,7 +11,7 @@ const PreviewReportsMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[464px] rounded-[28px] bg-[#eaf2ea]" />
+      <div className="h-[420px] rounded-[28px] bg-[#eaf2ea]" />
     ),
   },
 );
