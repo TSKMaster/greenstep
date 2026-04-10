@@ -142,105 +142,105 @@ export function MainRedesignPreview({
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#edf3ee] px-6 py-6">
+    <main className="relative min-h-screen overflow-hidden bg-[#edf3ee] px-3 py-3 pb-28 sm:px-4 sm:py-4 sm:pb-32 lg:px-6 lg:py-6 lg:pb-6">
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.36]"
         style={{ backgroundImage: "url('/bg.png')" }}
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(237,243,238,0.44),rgba(237,243,238,0.62))]" />
       <div className="relative z-10 mx-auto w-full max-w-[1440px]">
-        <header className="rounded-[32px] border border-[#c9ddc7] bg-[#4f9663] px-4 py-2 shadow-[0_14px_30px_rgba(52,102,65,0.15)]">
-          <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+        <header className="rounded-[28px] border border-[#c9ddc7] bg-[#4f9663] px-3 py-3 shadow-[0_14px_30px_rgba(52,102,65,0.15)] sm:px-4 lg:rounded-[32px] lg:py-2">
+          <div className="flex flex-nowrap items-center justify-between gap-3">
             <div className="flex items-center justify-start">
               <div className="flex items-center gap-0">
-                <div className="flex h-[58px] w-[58px] items-center justify-center overflow-hidden">
+                <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden sm:h-[52px] sm:w-[52px] lg:h-[58px] lg:w-[58px]">
                   <Image
                     src="/GreenStepLogo.svg"
                     alt="GreenStep logo"
                     width={64}
                     height={64}
-                    className="h-[4.35rem] w-auto object-contain"
+                    className="h-[3.5rem] w-auto object-contain sm:h-[3.8rem] lg:h-[4.35rem]"
                   />
                 </div>
-                <p className="text-[31px] font-semibold tracking-[-0.04em] text-[#f7fbf3]">
+                <p className="text-[24px] font-semibold tracking-[-0.04em] text-[#f7fbf3] sm:text-[27px] lg:text-[31px]">
                   GreenStep
                 </p>
               </div>
             </div>
 
-            <div className="min-w-0">
-              <div className="relative mx-auto h-[72px] max-w-[420px] rounded-[22px] border border-white/10 bg-white/8 px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-                <div className="pointer-events-none absolute left-1/2 top-2 flex -translate-x-1/2 items-center gap-1.5 text-[#f3fbf2]">
-                  <Leaf size={14} className="text-[#dff5dd]" strokeWidth={2} />
-                  <p className="text-center text-[9px] font-semibold uppercase leading-none tracking-[0.14em]">
+            <div className="hidden min-w-0 md:block">
+              <div className="relative mx-auto h-[68px] max-w-full rounded-[20px] border border-white/10 bg-white/8 px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:h-[72px] md:max-w-[420px] lg:rounded-[22px]">
+                <div className="pointer-events-none absolute left-1/2 top-2 flex -translate-x-1/2 items-center gap-1 text-[#f3fbf2] sm:gap-1.5">
+                  <Leaf size={13} className="text-[#dff5dd] sm:h-[14px] sm:w-[14px]" strokeWidth={2} />
+                  <p className="text-center text-[8px] font-semibold uppercase leading-none tracking-[0.14em] sm:text-[9px]">
                     Эко-индекс района
                   </p>
                 </div>
-                <div className="grid h-full grid-cols-[60px_minmax(0,1fr)] items-center gap-3 pb-1.5 pt-1.5">
+                <div className="grid h-full grid-cols-[54px_minmax(0,1fr)] items-center gap-2 pb-1.5 pt-1.5 sm:grid-cols-[60px_minmax(0,1fr)] sm:gap-3">
                   <div
-                    className="flex h-[58px] w-[58px] shrink-0 items-center justify-center self-center rounded-full p-[6px]"
+                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center self-center rounded-full p-[5px] sm:h-[58px] sm:w-[58px] sm:p-[6px]"
                     style={getGaugeStyle(ecoIndex)}
                   >
                     <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#4f9663] text-[#f7fbf3]">
-                      <p className="text-[18px] font-semibold leading-none">{ecoIndex}</p>
-                      <p className="mt-0.5 text-[7px] font-semibold uppercase tracking-[0.12em] text-[#f0fbef]">
+                      <p className="text-[16px] font-semibold leading-none sm:text-[18px]">{ecoIndex}</p>
+                      <p className="mt-0.5 text-[6px] font-semibold uppercase tracking-[0.12em] text-[#f0fbef] sm:text-[7px]">
                         {ecoLabel}
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid min-w-0 grid-cols-3 items-center gap-1.5 self-end pb-1 text-[#f7fbf3]">
+                  <div className="grid min-w-0 grid-cols-3 items-center gap-1 self-end pb-1 text-[#f7fbf3] sm:gap-1.5">
                     <div className="flex flex-col items-center justify-center text-center">
-                      <p className="text-[8.5px] uppercase tracking-[0.12em] text-[#f0fbef]">
+                      <p className="text-[7px] uppercase tracking-[0.1em] text-[#f0fbef] sm:text-[8.5px] sm:tracking-[0.12em]">
                         Обращения
                       </p>
-                      <p className="mt-1 text-[19px] font-semibold leading-none">{activeReports}</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-none sm:text-[19px]">{activeReports}</p>
                     </div>
                     <div className="flex flex-col items-center justify-center text-center">
-                      <p className="text-[8.5px] uppercase tracking-[0.12em] text-[#f0fbef]">
+                      <p className="text-[7px] uppercase tracking-[0.1em] text-[#f0fbef] sm:text-[8.5px] sm:tracking-[0.12em]">
                         Инициативы
                       </p>
-                      <p className="mt-1 text-[19px] font-semibold leading-none">{resolvedReports}</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-none sm:text-[19px]">{resolvedReports}</p>
                     </div>
                     <div className="flex flex-col items-center justify-center text-center">
-                      <p className="text-[8.5px] uppercase tracking-[0.12em] text-[#f0fbef]">
+                      <p className="text-[7px] uppercase tracking-[0.1em] text-[#f0fbef] sm:text-[8.5px] sm:tracking-[0.12em]">
                         Решено
                       </p>
-                      <p className="mt-1 text-[19px] font-semibold leading-none">{resolvedReports}</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-none sm:text-[19px]">{resolvedReports}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5">
+            <div className="flex min-w-0 items-center justify-end gap-2 sm:flex-nowrap">
               {isGuestView ? (
                 <>
                   <Link
                     href={signInHref}
-                    className="rounded-full border border-white/30 bg-white/14 px-4 py-2 text-sm font-semibold text-[#f7fbf3] transition hover:bg-white/20"
+                    className="rounded-full border border-white/30 bg-white/14 px-3 py-2 text-xs font-semibold text-[#f7fbf3] transition hover:bg-white/20 sm:px-4 sm:text-sm"
                   >
                     Вход
                   </Link>
                   <Link
                     href={signInHref}
-                    className="rounded-full bg-[#f7fbf3] px-4 py-2 text-sm font-semibold text-[#1d5b2b] transition hover:bg-[#edf7ea]"
+                    className="rounded-full bg-[#f7fbf3] px-3 py-2 text-xs font-semibold text-[#1d5b2b] transition hover:bg-[#edf7ea] sm:px-4 sm:text-sm"
                   >
                     Регистрация
                   </Link>
                 </>
               ) : (
                 <>
-                  <div className="flex min-w-[220px] items-center gap-3 rounded-full bg-white/14 px-3 py-2 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#173221] text-[18px] font-semibold lowercase text-white">
+                  <div className="flex min-w-0 items-center gap-2 rounded-full bg-white/14 px-2 py-1.5 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] sm:min-w-[220px] sm:gap-3 sm:px-3 sm:py-2">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#173221] text-[16px] font-semibold lowercase text-white sm:h-10 sm:w-10 sm:text-[18px]">
                       {userBadgeInitial}
                     </div>
                     <div className="min-w-0 leading-none">
-                      <p className="text-[9px] uppercase tracking-[0.14em] text-[#dceadb]">
+                      <p className="hidden text-[8px] uppercase tracking-[0.14em] text-[#dceadb] sm:block sm:text-[9px]">
                         {isAdmin ? "Администратор" : "Пользователь"}
                       </p>
-                      <p className="mt-1 truncate text-[12px] font-medium text-[#f7fbf3]">{email}</p>
-                      <p className="mt-1 text-[12px] text-[#e0eee0]">{rating} баллов</p>
+                      <p className="mt-1 truncate text-[11px] font-medium text-[#f7fbf3] sm:text-[12px]">{email}</p>
+                      <p className="mt-1 text-[11px] text-[#e0eee0] sm:text-[12px]">{rating} баллов</p>
                     </div>
                   </div>
                   <button
@@ -262,26 +262,28 @@ export function MainRedesignPreview({
           </div>
         ) : null}
 
-        <section className="mt-3 rounded-[32px] border border-[#cfe0cd] bg-white px-4 py-2 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-          <div className="grid grid-cols-5 gap-3">
+        <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#cfe0cd] bg-white/96 px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
+          <div className="grid grid-cols-5 gap-2 lg:gap-3">
             <Link
               href="/preview/main-redesign"
-              className="flex items-center justify-between rounded-[18px] border border-[#b7e8c1] bg-[#d9f6de] px-4 py-2 text-[15px] font-semibold text-[#12351d] shadow-[inset_1px_0_0_#1bc36a]"
+              className="flex items-center justify-center rounded-[18px] border border-[#b7e8c1] bg-[#d9f6de] px-2 py-3 text-[15px] font-semibold text-[#12351d] shadow-[inset_1px_0_0_#1bc36a] lg:justify-between lg:px-4 lg:py-2"
             >
-              <span className="flex items-center gap-3">
+              <span className="flex items-center gap-0 lg:gap-3">
                 <House size={20} className="text-[#12351d]" strokeWidth={2} />
-                <span>Главная</span>
+                <span className="hidden lg:inline">Главная</span>
               </span>
             </Link>
             <Link
               href="/statistics"
-              className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
+              className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
             >
-              <span className="flex items-center gap-3">
+              <span className="flex items-center gap-0 lg:gap-3">
                 <BarChart3 size={20} className="text-[#173221]" strokeWidth={2} />
-                <span>Статистика</span>
+                <span className="hidden lg:inline">Статистика</span>
               </span>
-              <DemoBadge />
+              <span className="hidden lg:inline-flex">
+                <DemoBadge />
+              </span>
             </Link>
             {[
               ["Задания", <ListTodo key="tasks" size={20} className="text-[#173221]" strokeWidth={2} />],
@@ -292,20 +294,22 @@ export function MainRedesignPreview({
                 key={item as string}
                 type="button"
                 onClick={() => openDemo("nav", `Раздел «${item as string}» находится в разработке.`)}
-                className="flex items-center justify-between rounded-[18px] bg-[#f3f7f1] px-4 py-2 text-left text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea]"
+                className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-left text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
               >
-                <span className="flex items-center gap-3">
+                <span className="flex items-center gap-0 lg:gap-3">
                   {iconNode}
-                  <span>{item as string}</span>
+                  <span className="hidden lg:inline">{item as string}</span>
                 </span>
-                <DemoBadge />
+                <span className="hidden lg:inline-flex">
+                  <DemoBadge />
+                </span>
               </button>
             ))}
           </div>
         </section>
 
-        <section className="mt-3 grid grid-cols-[300px_minmax(0,1fr)_320px] gap-4">
-          <div className="flex min-h-[760px] flex-col gap-3">
+        <section className="mt-3 grid grid-cols-1 gap-4 xl:grid-cols-[300px_minmax(0,1fr)_320px]">
+          <div className="order-2 flex flex-col gap-3 xl:order-1 xl:min-h-[760px]">
             <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -405,29 +409,29 @@ export function MainRedesignPreview({
             </section>
           </div>
 
-          <div className="flex min-h-[760px] flex-col gap-3">
+          <div className="order-1 flex flex-col gap-3 xl:order-2 xl:min-h-[760px]">
             <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-5 py-5 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-              <h1 className="max-w-[620px] text-[34px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#12351d]">
+              <h1 className="max-w-[620px] text-[28px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#12351d] sm:text-[32px] lg:text-[34px]">
                 Экологические обращения района
               </h1>
-              <p className="mt-3 max-w-[620px] text-[16px] leading-7 text-[#587160]">
+              <p className="mt-3 max-w-[620px] text-[15px] leading-6 text-[#587160] sm:text-[16px] sm:leading-7">
                 Сообщайте о проблемах на карте, прикрепляйте фото и отслеживайте статус обращения.
               </p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <Link
                   href={primaryCtaHref}
-                  className="inline-flex items-center justify-center rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c]"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto"
                   style={{ color: "#ffffff" }}
                 >
                   Сообщить о проблеме
                 </Link>
                 <Link
                   href={secondaryCtaHref}
-                  className="inline-flex items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-6 py-3 text-[15px] font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-6 py-3 text-[15px] font-semibold text-[#28452e] transition hover:bg-[#f6faf5] sm:w-auto"
                 >
                   Список заявок
                 </Link>
-                <div className="inline-flex items-center rounded-full border border-[#cfe0cd] bg-[#f3f7f1] p-1">
+                <div className="inline-flex w-full items-center justify-between rounded-full border border-[#cfe0cd] bg-[#f3f7f1] p-1 sm:w-auto sm:justify-start">
                   <Link
                     href="/preview/main-redesign?mode=guest"
                     className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
@@ -473,9 +477,48 @@ export function MainRedesignPreview({
                 </Link>
               </div>
             </section>
+
+            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)] md:hidden">
+              <div className="relative rounded-[22px] bg-[#4f9663] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <div className="pointer-events-none absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-1 text-[#f3fbf2]">
+                  <Leaf size={13} className="text-[#dff5dd]" strokeWidth={2} />
+                  <p className="text-center text-[8px] font-semibold uppercase leading-none tracking-[0.14em]">
+                    Эко-индекс района
+                  </p>
+                </div>
+                <div className="grid grid-cols-[54px_minmax(0,1fr)] items-center gap-2 pt-4">
+                  <div
+                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center self-center rounded-full p-[5px]"
+                    style={getGaugeStyle(ecoIndex)}
+                  >
+                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#4f9663] text-[#f7fbf3]">
+                      <p className="text-[16px] font-semibold leading-none">{ecoIndex}</p>
+                      <p className="mt-0.5 text-[6px] font-semibold uppercase tracking-[0.12em] text-[#f0fbef]">
+                        {ecoLabel}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid min-w-0 grid-cols-3 items-center gap-1 self-end pb-1 text-[#f7fbf3]">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <p className="text-[7px] uppercase tracking-[0.1em] text-[#f0fbef]">Обращения</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-none">{activeReports}</p>
+                    </div>
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <p className="text-[7px] uppercase tracking-[0.1em] text-[#f0fbef]">Инициативы</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-none">{resolvedReports}</p>
+                    </div>
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <p className="text-[7px] uppercase tracking-[0.1em] text-[#f0fbef]">Решено</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-none">{resolvedReports}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
-          <div className="flex min-h-[760px] flex-col gap-3">
+          <div className="order-3 flex flex-col gap-3 xl:min-h-[760px]">
             {isGuestView ? (
               <>
                 <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">

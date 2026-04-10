@@ -65,12 +65,12 @@ export function ReportLocationPicker({
   ];
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-border bg-white">
+    <div className="overflow-hidden rounded-[28px] border border-border bg-white lg:h-full">
       <MapContainer
         center={center}
         zoom={16}
         scrollWheelZoom
-        className="h-72 w-full"
+        className="h-72 w-full lg:h-full"
       >
         <ResizeMapOnMount />
         <TileLayer
