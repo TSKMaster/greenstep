@@ -69,6 +69,7 @@ export default async function MainRedesignPage({
   return (
     <MainRedesignPreview
       activeReports={activeReports}
+      basePath="/preview/main-redesign"
       currentUserId={user?.id ?? null}
       ecoIndex={ecoIndex}
       ecoLabel={ecoLabel}
@@ -77,6 +78,7 @@ export default async function MainRedesignPage({
       isAdmin={Boolean(profile?.is_admin)}
       myReports={myReports}
       myResolvedReports={myResolvedReports}
+      previewModeEnabled
       rating={profile?.rating ?? 0}
       reports={reports}
       resolvedReports={resolvedReports}

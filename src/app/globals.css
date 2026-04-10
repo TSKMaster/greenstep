@@ -119,14 +119,37 @@ select {
 }
 
 .preview-report-popup__status {
-  background: #ebf5e9;
   border-radius: 999px;
-  color: #2f8d3f;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   padding: 5px 8px;
   text-transform: uppercase;
+}
+
+.preview-report-popup__status--new {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.preview-report-popup__status--accepted {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.preview-report-popup__status--in_progress {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.preview-report-popup__status--resolved {
+  background: #ebf5e9;
+  color: #2f8d3f;
+}
+
+.preview-report-popup__status--rejected {
+  background: #ffe4e6;
+  color: #be123c;
 }
 
 .preview-report-popup__support {

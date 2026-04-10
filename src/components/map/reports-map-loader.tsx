@@ -17,9 +17,21 @@ const ReportsMap = dynamic(
 );
 
 type ReportsMapLoaderProps = {
+  currentUserId: string | null;
   reports: ReportListItem[];
+  showCreateCta?: boolean;
 };
 
-export function ReportsMapLoader({ reports }: ReportsMapLoaderProps) {
-  return <ReportsMap reports={reports} />;
+export function ReportsMapLoader({
+  currentUserId,
+  reports,
+  showCreateCta = false,
+}: ReportsMapLoaderProps) {
+  return (
+    <ReportsMap
+      currentUserId={currentUserId}
+      reports={reports}
+      showCreateCta={showCreateCta}
+    />
+  );
 }

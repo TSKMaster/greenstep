@@ -8,11 +8,12 @@ import {
   Bell,
   BookOpenText,
   CheckCircle2,
+  FilePlus,
   FileText,
   House,
   Leaf,
-  ListTodo,
   Map,
+  MapPinned,
   Trophy,
   Users,
 } from "lucide-react";
@@ -21,6 +22,7 @@ import type { ReportListItem } from "@/types";
 
 type MainRedesignPreviewProps = {
   activeReports: number;
+  basePath?: string;
   currentUserId: string | null;
   ecoIndex: number;
   ecoLabel: string;
@@ -29,6 +31,7 @@ type MainRedesignPreviewProps = {
   isAdmin: boolean;
   myReports: number;
   myResolvedReports: number;
+  previewModeEnabled?: boolean;
   rating: number;
   reports: ReportListItem[];
   resolvedReports: number;
@@ -63,12 +66,34 @@ function getGaugeStyle(value: number) {
   };
 }
 
-function buildGuestReportHref(reportId: string) {
-  return `/preview/main-redesign?mode=guest&report=${encodeURIComponent(reportId)}`;
+function buildMainHref({
+  basePath,
+  previewModeEnabled,
+  reportId,
+  viewerMode,
+}: {
+  basePath: string;
+  previewModeEnabled: boolean;
+  reportId?: string | null;
+  viewerMode: "guest" | "authorized";
+}) {
+  const params = new URLSearchParams();
+
+  if (previewModeEnabled) {
+    params.set("mode", viewerMode);
+  }
+
+  if (reportId) {
+    params.set("report", reportId);
+  }
+
+  const queryString = params.toString();
+  return queryString ? `${basePath}?${queryString}` : basePath;
 }
 
 export function MainRedesignPreview({
   activeReports,
+  basePath = "/preview/main-redesign",
   currentUserId,
   ecoIndex,
   ecoLabel,
@@ -77,6 +102,7 @@ export function MainRedesignPreview({
   isAdmin,
   myReports,
   myResolvedReports,
+  previewModeEnabled = true,
   rating,
   reports,
   resolvedReports,
@@ -92,25 +118,46 @@ export function MainRedesignPreview({
   const primaryCtaHref = isGuestView ? signInHref : "/reports/new";
   const secondaryCtaHref = isGuestView ? signInHref : "/my-reports";
   const guestMapExpandHref = selectedGuestReport
-    ? buildGuestReportHref(selectedGuestReport.id)
-    : "/preview/main-redesign?mode=guest";
+    ? buildMainHref({
+        basePath,
+        previewModeEnabled,
+        reportId: selectedGuestReport.id,
+        viewerMode: "guest",
+      })
+    : buildMainHref({
+        basePath,
+        previewModeEnabled,
+        viewerMode: "guest",
+      });
   const userBadgeInitial = email.trim().charAt(0).toLowerCase() || "g";
   const reportSummaryItems = isGuestView
     ? [
         {
-          href: "/preview/main-redesign?mode=guest",
+          href: buildMainHref({
+            basePath,
+            previewModeEnabled,
+            viewerMode: "guest",
+          }),
           icon: <FileText size={22} className="text-[#2f8734]" strokeWidth={2} />,
           label: "Всего заявок",
           value: totalReports,
         },
         {
-          href: "/preview/main-redesign?mode=guest",
+          href: buildMainHref({
+            basePath,
+            previewModeEnabled,
+            viewerMode: "guest",
+          }),
           icon: <CheckCircle2 size={22} className="text-[#2f8734]" strokeWidth={2} />,
           label: "Решено за 30 дней",
           value: resolvedThisMonth,
         },
         {
-          href: "/preview/main-redesign?mode=guest",
+          href: buildMainHref({
+            basePath,
+            previewModeEnabled,
+            viewerMode: "guest",
+          }),
           icon: <Map size={22} className="text-[#2f8734]" strokeWidth={2} />,
           label: "В работе",
           value: activeReports,
@@ -265,7 +312,11 @@ export function MainRedesignPreview({
         <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#cfe0cd] bg-white/96 px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
           <div className="grid grid-cols-5 gap-2 lg:gap-3">
             <Link
-              href="/preview/main-redesign"
+              href={buildMainHref({
+                basePath,
+                previewModeEnabled,
+                viewerMode: isGuestView ? "guest" : "authorized",
+              })}
               className="flex items-center justify-center rounded-[18px] border border-[#b7e8c1] bg-[#d9f6de] px-2 py-3 text-[15px] font-semibold text-[#12351d] shadow-[inset_1px_0_0_#1bc36a] lg:justify-between lg:px-4 lg:py-2"
             >
               <span className="flex items-center gap-0 lg:gap-3">
@@ -274,19 +325,24 @@ export function MainRedesignPreview({
               </span>
             </Link>
             <Link
-              href="/statistics"
+              href="/map"
               className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
             >
               <span className="flex items-center gap-0 lg:gap-3">
-                <BarChart3 size={20} className="text-[#173221]" strokeWidth={2} />
-                <span className="hidden lg:inline">Статистика</span>
+                <MapPinned size={20} className="text-[#173221]" strokeWidth={2} />
+                <span className="hidden lg:inline">Карта</span>
               </span>
-              <span className="hidden lg:inline-flex">
-                <DemoBadge />
+            </Link>
+            <Link
+              href="/reports"
+              className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
+            >
+              <span className="flex items-center gap-0 lg:gap-3">
+                <FileText size={20} className="text-[#173221]" strokeWidth={2} />
+                <span className="hidden lg:inline">Все заявки</span>
               </span>
             </Link>
             {[
-              ["Задания", <ListTodo key="tasks" size={20} className="text-[#173221]" strokeWidth={2} />],
               ["Обучение", <BookOpenText key="learn" size={20} className="text-[#173221]" strokeWidth={2} />],
               ["Сообщество", <Users key="community" size={20} className="text-[#173221]" strokeWidth={2} />],
             ].map(([item, iconNode]) => (
@@ -420,9 +476,10 @@ export function MainRedesignPreview({
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <Link
                   href={primaryCtaHref}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto"
+                  className="hidden w-full items-center justify-center gap-2 rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto lg:inline-flex"
                   style={{ color: "#ffffff" }}
                 >
+                  <FilePlus size={18} strokeWidth={2.2} />
                   Сообщить о проблеме
                 </Link>
                 <Link
@@ -431,28 +488,38 @@ export function MainRedesignPreview({
                 >
                   Список заявок
                 </Link>
-                <div className="inline-flex w-full items-center justify-between rounded-full border border-[#cfe0cd] bg-[#f3f7f1] p-1 sm:w-auto sm:justify-start">
-                  <Link
-                    href="/preview/main-redesign?mode=guest"
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      isGuestView
-                        ? "bg-white text-[#173221] shadow-sm"
-                        : "text-[#6a7d6d] hover:text-[#173221]"
-                    }`}
-                  >
-                    Гость
-                  </Link>
-                  <Link
-                    href="/preview/main-redesign?mode=auth"
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      !isGuestView
-                        ? "bg-white text-[#173221] shadow-sm"
-                        : "text-[#6a7d6d] hover:text-[#173221]"
-                    }`}
-                  >
-                    Авторизован
-                  </Link>
-                </div>
+                {previewModeEnabled ? (
+                  <div className="inline-flex w-full items-center justify-between rounded-full border border-[#cfe0cd] bg-[#f3f7f1] p-1 sm:w-auto sm:justify-start">
+                    <Link
+                      href={buildMainHref({
+                        basePath,
+                        previewModeEnabled,
+                        viewerMode: "guest",
+                      })}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        isGuestView
+                          ? "bg-white text-[#173221] shadow-sm"
+                          : "text-[#6a7d6d] hover:text-[#173221]"
+                      }`}
+                    >
+                      Гость
+                    </Link>
+                    <Link
+                      href={buildMainHref({
+                        basePath,
+                        previewModeEnabled,
+                        viewerMode: "authorized",
+                      })}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        !isGuestView
+                          ? "bg-white text-[#173221] shadow-sm"
+                          : "text-[#6a7d6d] hover:text-[#173221]"
+                      }`}
+                    >
+                      Авторизован
+                    </Link>
+                  </div>
+                ) : null}
               </div>
             </section>
 
@@ -466,15 +533,13 @@ export function MainRedesignPreview({
 
               <div className="relative mt-4">
                 <PreviewReportsMapLoader
+                  basePath={basePath}
                   currentUserId={isGuestView ? null : currentUserId}
+                  expandHref={isGuestView ? guestMapExpandHref : "/map"}
+                  expandLabel={isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
+                  previewModeEnabled={previewModeEnabled}
                   reports={reports}
                 />
-                <Link
-                  href={isGuestView ? guestMapExpandHref : "/map"}
-                  className="absolute right-5 bottom-5 z-[700] rounded-full border border-[#d4e4d2] bg-white/96 px-4 py-2 text-sm font-semibold text-[#28452e] shadow-sm transition hover:bg-[#f6faf5]"
-                >
-                  {isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
-                </Link>
               </div>
             </section>
 
@@ -637,6 +702,16 @@ export function MainRedesignPreview({
           </div>
         </section>
       </div>
+
+      <Link
+        href={primaryCtaHref}
+        aria-label="Сообщить о проблеме"
+        className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
+        style={{ color: "#ffffff" }}
+      >
+        <FilePlus size={22} strokeWidth={2.3} />
+      </Link>
     </main>
   );
 }
+

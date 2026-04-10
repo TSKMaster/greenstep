@@ -1,91 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
-import L, { icon } from "leaflet";
-import "leaflet.markercluster";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { ClusteredReportMarkers } from "@/components/map/clustered-report-markers";
+import {
+  REPORT_CATEGORY_ORDER,
+  ReportMapLegend,
+  getReportCategoryCounts,
+} from "@/components/map/report-map-theme";
 import { DEFAULT_MAP_CENTER } from "@/lib/constants";
-import type { ReportListItem } from "@/types";
-
-const markerIcon = icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconAnchor: [12, 41],
-  iconSize: [25, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
-
-function getStatusText(status: ReportListItem["status"]) {
-  switch (status) {
-    case "resolved":
-      return "Решено";
-    case "in_progress":
-      return "В работе";
-    case "accepted":
-      return "Принято";
-    case "rejected":
-      return "Отклонено";
-    default:
-      return "Новая";
-  }
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function buildPreviewReportHref(reportId: string) {
-  return `/preview/main-redesign?mode=guest&report=${encodeURIComponent(reportId)}`;
-}
-
-function buildPopupMarkup(report: ReportListItem, currentUserId: string | null) {
-  const title = escapeHtml(report.address || report.category);
-  const category = escapeHtml(report.category);
-  const status = escapeHtml(getStatusText(report.status));
-  const description = escapeHtml(report.description);
-  const shortDescription =
-    description.length > 110 ? `${description.slice(0, 107)}...` : description;
-  const detailsHref = currentUserId
-    ? `/reports/${report.id}`
-    : buildPreviewReportHref(report.id);
-  const signInHref = "/auth/sign-in";
-  const isOwnReport = Boolean(currentUserId && report.user_id === currentUserId);
-  const isGuest = !currentUserId;
-  const actions = isOwnReport
-    ? `<a class="preview-report-popup__link preview-report-popup__link--primary" href="${detailsHref}">Перейти</a>`
-    : isGuest
-      ? `
-      <div class="preview-report-popup__actions">
-        <a class="preview-report-popup__link preview-report-popup__link--ghost" href="${detailsHref}">Открыть в preview</a>
-        <a class="preview-report-popup__link preview-report-popup__link--primary" href="${signInHref}">Войти и поддержать</a>
-      </div>
-    `
-      : `
-      <div class="preview-report-popup__actions">
-        <a class="preview-report-popup__link preview-report-popup__link--ghost" href="${detailsHref}">Перейти</a>
-        <a class="preview-report-popup__link preview-report-popup__link--primary" href="${detailsHref}">Поддержать</a>
-      </div>
-    `;
-
-  return `
-    <div class="preview-report-popup">
-      <p class="preview-report-popup__eyebrow">${category}</p>
-      <h3 class="preview-report-popup__title">${title}</h3>
-      <div class="preview-report-popup__meta">
-        <span class="preview-report-popup__status">${status}</span>
-        <span class="preview-report-popup__support">Поддержка: ${report.support_count}</span>
-      </div>
-      <p class="preview-report-popup__body">${shortDescription}</p>
-      ${actions}
-    </div>
-  `;
-}
+import type { ReportCategory, ReportListItem } from "@/types";
 
 function ResizeMapOnMount() {
   const map = useMap();
@@ -103,79 +28,84 @@ function ResizeMapOnMount() {
   return null;
 }
 
-function ClusteredMarkers({ currentUserId, reports }: PreviewReportsMapProps) {
-  const map = useMap();
-
-  useEffect(() => {
-    const clusterGroup = L.markerClusterGroup({
-      chunkedLoading: true,
-      disableClusteringAtZoom: 18,
-      maxClusterRadius: 40,
-      showCoverageOnHover: false,
-      spiderfyOnMaxZoom: true,
-      iconCreateFunction: (cluster) =>
-        L.divIcon({
-          className: "preview-marker-cluster",
-          html: `<span>${cluster.getChildCount()}</span>`,
-          iconSize: [42, 42],
-        }),
-    });
-
-    reports.forEach((report) => {
-      const marker = L.marker(
-        [
-          Number(report.latitude ?? DEFAULT_MAP_CENTER.lat),
-          Number(report.longitude ?? DEFAULT_MAP_CENTER.lng),
-        ],
-        { icon: markerIcon },
-      );
-
-      marker.bindPopup(buildPopupMarkup(report, currentUserId), {
-        className: "preview-report-popup-shell",
-        closeButton: false,
-        maxWidth: 280,
-        minWidth: 240,
-        offset: [0, -24],
-      });
-
-      clusterGroup.addLayer(marker);
-    });
-
-    map.addLayer(clusterGroup);
-
-    return () => {
-      map.removeLayer(clusterGroup);
-      clusterGroup.clearLayers();
-    };
-  }, [currentUserId, map, reports]);
-
-  return null;
-}
-
 type PreviewReportsMapProps = {
+  basePath: string;
   currentUserId: string | null;
+  expandHref: string;
+  expandLabel: string;
+  previewModeEnabled: boolean;
   reports: ReportListItem[];
 };
 
 export function PreviewReportsMap({
+  basePath,
   currentUserId,
+  expandHref,
+  expandLabel,
+  previewModeEnabled,
   reports,
 }: PreviewReportsMapProps) {
+  const [selectedCategories, setSelectedCategories] =
+    useState<ReportCategory[]>(REPORT_CATEGORY_ORDER);
+
+  const categoryCounts = useMemo(() => getReportCategoryCounts(reports), [reports]);
+  const filteredReports = useMemo(
+    () =>
+      reports.filter((report) => selectedCategories.includes(report.category)),
+    [reports, selectedCategories],
+  );
+
+  function handleToggleCategory(category: ReportCategory) {
+    setSelectedCategories((current) =>
+      current.includes(category)
+        ? current.filter((item) => item !== category)
+        : [...current, category],
+    );
+  }
+
   return (
-    <div className="h-[420px] overflow-hidden rounded-[28px] border border-[#d4e4d2]">
-      <MapContainer
-        center={[DEFAULT_MAP_CENTER.lat, DEFAULT_MAP_CENTER.lng]}
-        zoom={15}
-        scrollWheelZoom
-        className="h-full w-full"
-      >
-        <ResizeMapOnMount />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <div className="flex flex-col gap-3">
+      <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#d4e4d2]">
+        <div className="absolute right-4 top-4 z-[500] hidden w-[240px] flex-col items-center gap-3 lg:flex">
+          <ReportMapLegend
+            className="pointer-events-auto w-full"
+            counts={categoryCounts}
+            onToggleCategory={handleToggleCategory}
+            selectedCategories={selectedCategories}
+          />
+        </div>
+        <MapContainer
+          center={[DEFAULT_MAP_CENTER.lat, DEFAULT_MAP_CENTER.lng]}
+          zoom={15}
+          scrollWheelZoom
+          className="h-full w-full"
+        >
+          <ResizeMapOnMount />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <ClusteredReportMarkers
+            basePath={basePath}
+            currentUserId={currentUserId}
+            previewModeEnabled={previewModeEnabled}
+            reports={filteredReports}
+          />
+        </MapContainer>
+        <Link
+          href={expandHref}
+          className="absolute right-5 bottom-5 z-[700] rounded-full border border-[#d4e4d2] bg-white/96 px-4 py-2 text-sm font-semibold text-[#28452e] shadow-sm transition hover:bg-[#f6faf5]"
+        >
+          {expandLabel}
+        </Link>
+      </div>
+      <div className="lg:hidden">
+        <ReportMapLegend
+          counts={categoryCounts}
+          onToggleCategory={handleToggleCategory}
+          selectedCategories={selectedCategories}
         />
-        <ClusteredMarkers currentUserId={currentUserId} reports={reports} />
-      </MapContainer>
+      </div>
     </div>
   );
 }

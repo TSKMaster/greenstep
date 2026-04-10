@@ -17,13 +17,30 @@ const PreviewReportsMap = dynamic(
 );
 
 type PreviewReportsMapLoaderProps = {
+  basePath: string;
   currentUserId: string | null;
+  expandHref: string;
+  expandLabel: string;
+  previewModeEnabled: boolean;
   reports: ReportListItem[];
 };
 
 export function PreviewReportsMapLoader({
+  basePath,
   currentUserId,
+  expandHref,
+  expandLabel,
+  previewModeEnabled,
   reports,
 }: PreviewReportsMapLoaderProps) {
-  return <PreviewReportsMap currentUserId={currentUserId} reports={reports} />;
+  return (
+    <PreviewReportsMap
+      basePath={basePath}
+      currentUserId={currentUserId}
+      expandHref={expandHref}
+      expandLabel={expandLabel}
+      previewModeEnabled={previewModeEnabled}
+      reports={reports}
+    />
+  );
 }
