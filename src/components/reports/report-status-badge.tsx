@@ -12,7 +12,7 @@ export function getReportStatusLabel(status: RequestStatus) {
   return STATUS_LABELS[status];
 }
 
-function getStatusClassName(status: RequestStatus) {
+export function getReportStatusClassName(status: RequestStatus) {
   switch (status) {
     case "new":
       return "bg-sky-600 text-white";
@@ -36,7 +36,7 @@ type ReportStatusBadgeProps = {
 export function ReportStatusBadge({ status }: ReportStatusBadgeProps) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClassName(status)}`}
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getReportStatusClassName(status)}`}
     >
       {getReportStatusLabel(status)}
     </span>
