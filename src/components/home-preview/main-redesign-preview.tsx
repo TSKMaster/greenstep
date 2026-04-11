@@ -25,6 +25,7 @@ type MainRedesignPreviewProps = {
   activeReports: number;
   basePath?: string;
   currentUserId: string | null;
+  displayName?: string | null;
   ecoIndex: number;
   ecoLabel: string;
   email: string;
@@ -96,6 +97,7 @@ export function MainRedesignPreview({
   activeReports,
   basePath = "/preview/main-redesign",
   currentUserId,
+  displayName,
   ecoIndex,
   ecoLabel,
   email,
@@ -278,7 +280,12 @@ export function MainRedesignPreview({
                 </>
               ) : (
                 <>
-                  <HeaderUserMenu email={email} isAdmin={isAdmin} rating={rating} />
+                  <HeaderUserMenu
+                    displayName={displayName}
+                    email={email}
+                    isAdmin={isAdmin}
+                    rating={rating}
+                  />
                   <button
                     type="button"
                     onClick={() => openDemo("nav", "Уведомления находятся в разработке.")}

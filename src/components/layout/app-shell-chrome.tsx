@@ -12,6 +12,7 @@ import {
 import { HeaderUserMenu } from "@/components/layout/header-user-menu";
 
 type AppShellChromeProps = {
+  displayName?: string | null;
   email: string;
   isAdmin: boolean;
   rating: number;
@@ -35,6 +36,7 @@ function DemoBadge() {
 }
 
 export function AppShellChrome({
+  displayName,
   email,
   isAdmin,
   rating,
@@ -99,7 +101,12 @@ export function AppShellChrome({
           </div>
 
           <div className="flex min-w-0 items-center justify-end gap-2 sm:flex-nowrap">
-            <HeaderUserMenu email={email} isAdmin={isAdmin} rating={rating} />
+            <HeaderUserMenu
+              displayName={displayName}
+              email={email}
+              isAdmin={isAdmin}
+              rating={rating}
+            />
             <button
               type="button"
               className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"

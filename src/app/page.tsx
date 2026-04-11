@@ -59,6 +59,7 @@ export default async function Home({ searchParams }: HomePageProps) {
       activeReports={activeReports}
       basePath="/"
       currentUserId={user?.id ?? null}
+      displayName={profile?.full_name ?? user?.user_metadata?.full_name ?? null}
       ecoIndex={ecoIndex}
       ecoLabel={ecoLabel}
       email={user?.email ?? profile?.email ?? "guest@greenstep.local"}

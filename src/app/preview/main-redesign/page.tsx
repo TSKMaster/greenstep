@@ -71,6 +71,7 @@ export default async function MainRedesignPage({
       activeReports={activeReports}
       basePath="/preview/main-redesign"
       currentUserId={user?.id ?? null}
+      displayName={profile?.full_name ?? user?.user_metadata?.full_name ?? null}
       ecoIndex={ecoIndex}
       ecoLabel={ecoLabel}
       email={user?.email ?? profile?.email ?? "demo@greenstep.local"}

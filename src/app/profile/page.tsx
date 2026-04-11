@@ -10,6 +10,7 @@ export default async function ProfilePage() {
   }
 
   const email = user.email ?? profile?.email ?? "";
+  const displayName = profile?.full_name ?? user.user_metadata?.full_name ?? null;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#edf3ee] px-3 py-3 pb-28 sm:px-4 sm:py-4 sm:pb-32 lg:px-6 lg:py-5 lg:pb-6">
@@ -20,6 +21,7 @@ export default async function ProfilePage() {
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(237,243,238,0.44),rgba(237,243,238,0.62))]" />
       <div className="relative z-10 mx-auto w-full max-w-[1440px]">
         <AppShellChrome
+          displayName={displayName}
           email={email}
           isAdmin={Boolean(profile?.is_admin)}
           rating={profile?.rating ?? 0}
@@ -29,6 +31,7 @@ export default async function ProfilePage() {
         <section className="mt-3 rounded-[28px] border border-[#d4e4d2] bg-white p-6 shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:rounded-[32px] lg:p-8">
           <div className="grid gap-4 lg:grid-cols-3">
             {[
+              ["Имя", displayName ?? "Не указано"],
               ["Email", email],
               ["Роль", profile?.is_admin ? "Администратор" : "Пользователь"],
               ["Баллы", String(profile?.rating ?? 0)],

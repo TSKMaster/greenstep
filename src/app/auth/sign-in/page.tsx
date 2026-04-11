@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { SignInForm } from "@/components/auth/sign-in-form";
 
 export default function SignInPage() {
@@ -30,18 +29,7 @@ export default function SignInPage() {
             </div>
 
             <div className="p-8">
-              <h1 className="text-3xl font-bold text-primary-dark">Вход</h1>
-              <p className="mt-4 text-sm leading-6 text-foreground/80">
-                Введи email. На почту придет ссылка, по которой можно войти в
-                приложение.
-              </p>
               <SignInForm />
-              <Link
-                href="/"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-2xl border border-[#d4e4d2] bg-white px-4 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
-              >
-                На главную
-              </Link>
             </div>
           </section>
         </div>

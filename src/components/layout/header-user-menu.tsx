@@ -7,12 +7,14 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type HeaderUserMenuProps = {
+  displayName?: string | null;
   email: string;
   isAdmin: boolean;
   rating: number;
 };
 
 export function HeaderUserMenu({
+  displayName,
   email,
   isAdmin,
   rating,
@@ -21,7 +23,8 @@ export function HeaderUserMenu({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const userBadgeInitial = email.trim().charAt(0).toLowerCase() || "g";
+  const resolvedDisplayName = displayName?.trim() || email;
+  const userBadgeInitial = resolvedDisplayName.trim().charAt(0).toLowerCase() || "g";
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -81,9 +84,9 @@ export function HeaderUserMenu({
             {isAdmin ? "Администратор" : "Пользователь"}
           </p>
           <p className="mt-1 truncate text-[11px] font-medium text-[#f7fbf3] sm:text-[12px]">
-            {email}
+            {resolvedDisplayName}
           </p>
-          <p className="mt-1 text-[11px] text-[#e0eee0] sm:text-[12px]">
+          <p className="mt-1 truncate text-[11px] text-[#e0eee0] sm:text-[12px]">
             {rating} баллов
           </p>
         </div>
@@ -96,10 +99,14 @@ export function HeaderUserMenu({
 
       {isOpen ? (
         <div className="absolute right-0 top-[calc(100%+10px)] z-[1400] w-[220px] rounded-[22px] border border-[#d4e4d2] bg-white p-2 shadow-[0_24px_80px_rgba(33,72,43,0.18)]">
+          <div className="rounded-[16px] bg-[#f7fbf6] px-3 py-3">
+            <p className="truncate text-sm font-semibold text-[#173221]">{resolvedDisplayName}</p>
+            <p className="mt-1 truncate text-xs text-[#5f7464]">{email}</p>
+          </div>
           <Link
             href="/profile"
             onClick={() => setIsOpen(false)}
-            className="flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-medium text-[#173221] transition hover:bg-[#f3f7f1]"
+            className="mt-2 flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-medium text-[#173221] transition hover:bg-[#f3f7f1]"
           >
             <UserCircle2 size={18} className="text-[#2f8734]" strokeWidth={2.2} />
             Профиль
