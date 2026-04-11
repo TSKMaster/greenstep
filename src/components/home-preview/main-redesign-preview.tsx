@@ -462,14 +462,25 @@ export function MainRedesignPreview({
           </div>
 
           <div className="order-1 flex flex-col gap-3 xl:order-2 xl:min-h-[760px]">
-            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-5 py-5 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-              <h1 className="max-w-[620px] text-[28px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#12351d] sm:text-[32px] lg:text-[34px]">
-                Экологические обращения района
-              </h1>
-              <p className="mt-3 max-w-[620px] text-[15px] leading-6 text-[#587160] sm:text-[16px] sm:leading-7">
-                Сообщайте о проблемах на карте, прикрепляйте фото и отслеживайте статус обращения.
-              </p>
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-5 shadow-[0_14px_30px_rgba(59,94,57,0.08)] sm:px-5">
+              <div className="mx-auto flex max-w-[760px] flex-col items-center text-center">
+                <h1 className="text-[28px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#12351d] sm:text-[32px] lg:text-[34px]">
+                  Экологические обращения района
+                </h1>
+              </div>
+
+              <div className="relative mt-4">
+                <PreviewReportsMapLoader
+                  basePath={basePath}
+                  currentUserId={isGuestView ? null : currentUserId}
+                  expandHref={isGuestView ? guestMapExpandHref : "/map"}
+                  expandLabel={isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
+                  previewModeEnabled={previewModeEnabled}
+                  reports={reports}
+                />
+              </div>
+
+              <div className="mt-5 flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <Link
                   href={primaryCtaHref}
                   className="hidden w-full items-center justify-center gap-2 rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto lg:inline-flex"
@@ -516,26 +527,6 @@ export function MainRedesignPreview({
                     </Link>
                   </div>
                 ) : null}
-              </div>
-            </section>
-
-            <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
-              <div>
-                <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                  <Map size={20} className="text-[#2f8734]" strokeWidth={2} />
-                  <span>Карта обращений района</span>
-                </h2>
-              </div>
-
-              <div className="relative mt-4">
-                <PreviewReportsMapLoader
-                  basePath={basePath}
-                  currentUserId={isGuestView ? null : currentUserId}
-                  expandHref={isGuestView ? guestMapExpandHref : "/map"}
-                  expandLabel={isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
-                  previewModeEnabled={previewModeEnabled}
-                  reports={reports}
-                />
               </div>
             </section>
 

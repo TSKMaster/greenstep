@@ -95,12 +95,12 @@ export function ReportMapLegend({
 
   return (
     <div
-      className={`w-full max-w-none rounded-[20px] border border-[#d4e4d2] bg-white/28 px-4 py-3 shadow-[0_14px_24px_rgba(59,94,57,0.14)] backdrop-blur lg:max-w-[240px] ${className}`.trim()}
+      className={`w-full max-w-none rounded-[20px] border border-[#d4e4d2] bg-white/28 px-3 py-2.5 shadow-[0_14px_24px_rgba(59,94,57,0.14)] backdrop-blur lg:max-w-[180px] ${className}`.trim()}
     >
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6c8770]">
         Легенда карты
       </p>
-      <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 lg:grid-cols-1">
+      <div className="mt-2.5 grid grid-cols-2 gap-x-2 gap-y-1.5 lg:grid-cols-1">
         {REPORT_CATEGORY_ORDER.map((category) => {
           const theme = REPORT_CATEGORY_THEMES[category];
           const isActive = selectedSet.has(category);
@@ -111,27 +111,27 @@ export function ReportMapLegend({
               key={category}
               type="button"
               onClick={() => onToggleCategory?.(category)}
-              className={`grid w-full grid-cols-[12px_minmax(0,1fr)_auto] items-start gap-x-2.5 rounded-[14px] px-2 py-1.5 text-left text-[13px] transition ${
-                isInteractive
-                  ? "cursor-pointer hover:bg-white/35"
-                  : "cursor-default"
+              className={`grid w-full grid-cols-[10px_minmax(0,1fr)_auto] items-start gap-x-2 rounded-[12px] px-1.5 py-1.5 text-left transition ${
+                isInteractive ? "cursor-pointer hover:bg-white/35" : "cursor-default"
               } ${
-                isActive
-                  ? "text-[#24442d]"
-                  : "text-[#708676] opacity-55"
+                isActive ? "text-[#24442d]" : "text-[#708676] opacity-55"
               }`}
               aria-pressed={isActive}
             >
               <span
-                className="h-3 w-3 shrink-0 rounded-full border border-white shadow-sm"
+                className="mt-[3px] h-2.5 w-2.5 shrink-0 self-start rounded-full border border-white shadow-sm"
                 style={{ backgroundColor: theme.color }}
               />
-              <span className="min-w-0 leading-4">{theme.label}</span>
+              <span className="min-w-0 text-[12px] leading-[1.25]">
+                {theme.label.split(" ").map((word) => (
+                  <span key={`${category}-${word}`} className="block">
+                    {word}
+                  </span>
+                ))}
+              </span>
               <span
-                className={`mt-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                  isActive
-                    ? "bg-white/75 text-[#1f4129]"
-                    : "bg-white/45 text-[#6f8474]"
+                className={`mt-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none ${
+                  isActive ? "bg-white/75 text-[#1f4129]" : "bg-white/45 text-[#6f8474]"
                 }`}
               >
                 {count}

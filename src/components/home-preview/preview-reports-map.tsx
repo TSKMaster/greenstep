@@ -66,9 +66,9 @@ export function PreviewReportsMap({
   return (
     <div className="flex flex-col gap-3">
       <div className="relative h-[420px] overflow-hidden rounded-[28px] border border-[#d4e4d2]">
-        <div className="absolute right-4 top-4 z-[500] hidden w-[240px] flex-col items-center gap-3 lg:flex">
+        <div className="absolute right-4 top-4 z-[500] hidden w-[180px] lg:block">
           <ReportMapLegend
-            className="pointer-events-auto w-full"
+            className="pointer-events-auto w-full lg:max-w-none"
             counts={categoryCounts}
             onToggleCategory={handleToggleCategory}
             selectedCategories={selectedCategories}
