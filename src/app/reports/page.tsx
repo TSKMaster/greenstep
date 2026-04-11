@@ -75,22 +75,10 @@ export default async function ReportsPage() {
             ))}
           </div>
 
-          <div className="mt-6 flex justify-center">
-            <Link
-              href="/reports/new"
-              className="hidden items-center justify-center gap-2 rounded-2xl bg-[#2f8734] px-5 py-3 font-semibold !text-white transition hover:bg-[#286f2c] lg:inline-flex"
-            >
-              <FilePlus size={18} strokeWidth={2.2} />
-              Новая заявка
-            </Link>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-[-0.04em] text-[#12351d] lg:hidden">
-                Все заявки
-              </h1>
-            </div>
+          <div className="mt-2 lg:hidden">
+            <h1 className="text-2xl font-semibold tracking-[-0.04em] text-[#12351d]">
+              Все заявки
+            </h1>
           </div>
 
           <ReportsListPanel reports={reports} />

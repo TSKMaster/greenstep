@@ -15,17 +15,17 @@ export function getReportStatusLabel(status: RequestStatus) {
 export function getReportStatusClassName(status: RequestStatus) {
   switch (status) {
     case "new":
-      return "bg-sky-600 text-white";
+      return "border border-sky-200 bg-sky-50 text-sky-800";
     case "accepted":
-      return "bg-amber-500 text-white";
+      return "border border-amber-200 bg-amber-50 text-amber-800";
     case "in_progress":
-      return "bg-violet-600 text-white";
+      return "border border-violet-200 bg-violet-50 text-violet-800";
     case "resolved":
-      return "bg-emerald-600 text-white";
+      return "border border-emerald-200 bg-emerald-50 text-emerald-800";
     case "rejected":
-      return "bg-rose-600 text-white";
+      return "border border-rose-200 bg-rose-50 text-rose-800";
     default:
-      return "bg-slate-600 text-white";
+      return "border border-slate-200 bg-slate-50 text-slate-700";
   }
 }
 

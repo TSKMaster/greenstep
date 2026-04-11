@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { FilePlus } from "lucide-react";
 import {
   ReportStatusBadge,
   getReportStatusClassName,
@@ -62,36 +63,50 @@ export function ReportsListPanel({ reports }: ReportsListPanelProps) {
 
   return (
     <>
-      <div className="mt-6 flex flex-wrap justify-center gap-2.5">
-        {STATUS_ORDER.map((status) => {
-          const isActive = selectedStatuses.includes(status);
+      <div className="mt-5 flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-wrap justify-center gap-2.5 lg:justify-start">
+          {STATUS_ORDER.map((status) => {
+            const isActive = selectedStatuses.includes(status);
 
-          return (
-            <button
-              key={status}
-              type="button"
-              onClick={() => toggleStatus(status)}
-              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${
-                isActive
-                  ? "border-transparent shadow-sm hover:brightness-[1.05]"
-                  : "border-[#d4e4d2] bg-white text-[#587160] opacity-80 hover:border-[#9fcca7] hover:bg-[#f6faf5] hover:text-[#23442d]"
-              } ${isActive ? getReportStatusClassName(status) : ""}`}
-            >
-              <span>{getReportStatusLabel(status)}</span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs ${
-                  isActive ? "bg-white/20 text-white" : "bg-[#f3f7f1] text-[#35533c]"
+            return (
+              <button
+                key={status}
+                type="button"
+                onClick={() => toggleStatus(status)}
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${
+                  isActive
+                    ? `shadow-sm ${getReportStatusClassName(status)}`
+                    : "border-[#d4e4d2] bg-white text-[#587160] opacity-85 hover:border-[#9fcca7] hover:bg-[#f6faf5] hover:text-[#23442d]"
                 }`}
               >
-                {statusCounts[status]}
-              </span>
-            </button>
-          );
-        })}
+                <span>{getReportStatusLabel(status)}</span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    isActive
+                      ? "bg-white/80 text-[#28452e]"
+                      : "bg-[#f3f7f1] text-[#35533c]"
+                  }`}
+                >
+                  {statusCounts[status]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="hidden lg:flex lg:justify-end">
+          <Link
+            href="/reports/new"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#2f8734] px-5 py-2 font-semibold !text-white transition hover:bg-[#286f2c]"
+          >
+            <FilePlus size={18} strokeWidth={2.2} />
+            Новая заявка
+          </Link>
+        </div>
       </div>
 
       {filteredReports.length > 0 ? (
-        <div className="mt-8 grid gap-4">
+        <div className="mt-5 grid gap-4">
           {filteredReports.map((report) => (
             <Link
               key={report.id}
@@ -113,7 +128,7 @@ export function ReportsListPanel({ reports }: ReportsListPanelProps) {
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-3xl bg-[#f3f7f1] p-6 text-sm leading-6 text-[#587160]">
+        <div className="mt-5 rounded-3xl bg-[#f3f7f1] p-6 text-sm leading-6 text-[#587160]">
           По выбранным статусам заявок пока нет.
         </div>
       )}
