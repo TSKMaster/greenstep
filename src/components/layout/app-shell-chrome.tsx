@@ -9,6 +9,7 @@ import {
   MapPinned,
   Users,
 } from "lucide-react";
+import { HeaderUserMenu } from "@/components/layout/header-user-menu";
 
 type AppShellChromeProps = {
   email: string;
@@ -39,7 +40,6 @@ export function AppShellChrome({
   rating,
   title,
 }: AppShellChromeProps) {
-  const userBadgeInitial = email.trim().charAt(0).toLowerCase() || "g";
   const navItems: NavItem[] = [
     {
       href: "/",
@@ -99,22 +99,7 @@ export function AppShellChrome({
           </div>
 
           <div className="flex min-w-0 items-center justify-end gap-2 sm:flex-nowrap">
-            <div className="flex min-w-0 items-center gap-2 rounded-full bg-white/14 px-2 py-1.5 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] sm:min-w-[220px] sm:gap-3 sm:px-3 sm:py-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#173221] text-[16px] font-semibold lowercase text-white sm:h-10 sm:w-10 sm:text-[18px]">
-                {userBadgeInitial}
-              </div>
-              <div className="min-w-0 leading-none">
-                <p className="hidden text-[8px] uppercase tracking-[0.14em] text-[#dceadb] sm:block sm:text-[9px]">
-                  {isAdmin ? "Администратор" : "Пользователь"}
-                </p>
-                <p className="mt-1 truncate text-[11px] font-medium text-[#f7fbf3] sm:text-[12px]">
-                  {email}
-                </p>
-                <p className="mt-1 text-[11px] text-[#e0eee0] sm:text-[12px]">
-                  {rating} баллов
-                </p>
-              </div>
-            </div>
+            <HeaderUserMenu email={email} isAdmin={isAdmin} rating={rating} />
             <button
               type="button"
               className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"

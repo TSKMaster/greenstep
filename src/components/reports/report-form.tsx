@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReportLocationPickerLoader } from "@/components/reports/report-location-picker-loader";
 import { DEFAULT_MAP_CENTER, REPORT_CATEGORIES } from "@/lib/constants";
@@ -40,6 +41,8 @@ function getFileExtension(file: File) {
 
 export function ReportForm({ userId }: ReportFormProps) {
   const router = useRouter();
+  const addressLookupControllerRef = useRef<AbortController | null>(null);
+  const isAddressManuallyEditedRef = useRef(false);
   const [category, setCategory] = useState<ReportCategory>(REPORT_CATEGORIES[0]);
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
@@ -51,6 +54,10 @@ export function ReportForm({ userId }: ReportFormProps) {
   const [fieldErrors, setFieldErrors] = useState<ReportFieldErrors>({});
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const [addressLookupError, setAddressLookupError] = useState("");
+  const [hasSelectedLocation, setHasSelectedLocation] = useState(false);
+  const [pendingStepAlert, setPendingStepAlert] = useState<string[] | null>(null);
 
   useEffect(() => {
     if (!photoFile) {
@@ -66,9 +73,68 @@ export function ReportForm({ userId }: ReportFormProps) {
     };
   }, [photoFile]);
 
+  useEffect(() => {
+    return () => {
+      addressLookupControllerRef.current?.abort();
+    };
+  }, []);
+
+  async function resolveAddressFromCoordinates(
+    nextLatitude: number,
+    nextLongitude: number,
+  ) {
+    addressLookupControllerRef.current?.abort();
+
+    const controller = new AbortController();
+    addressLookupControllerRef.current = controller;
+
+    setIsResolvingAddress(true);
+    setAddressLookupError("");
+
+    try {
+      const response = await fetch(
+        `/api/geocode/reverse?lat=${nextLatitude.toFixed(6)}&lng=${nextLongitude.toFixed(6)}`,
+        {
+          signal: controller.signal,
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`reverse geocoding failed: ${response.status}`);
+      }
+
+      const data = (await response.json()) as { address?: string | null };
+
+      if (!controller.signal.aborted && data.address && !isAddressManuallyEditedRef.current) {
+        setAddress(data.address);
+        setFieldErrors((current) => ({ ...current, address: undefined }));
+      }
+    } catch (error) {
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      console.error("Failed to resolve address for report", error);
+      setAddressLookupError(
+        "Не удалось определить адрес автоматически. Его можно ввести вручную.",
+      );
+    } finally {
+      if (addressLookupControllerRef.current === controller) {
+        addressLookupControllerRef.current = null;
+      }
+
+      if (!controller.signal.aborted) {
+        setIsResolvingAddress(false);
+      }
+    }
+  }
+
   function updateCoordinates(nextLatitude: number, nextLongitude: number) {
     setLatitude(nextLatitude.toFixed(6));
     setLongitude(nextLongitude.toFixed(6));
+    setHasSelectedLocation(true);
+    isAddressManuallyEditedRef.current = false;
+    void resolveAddressFromCoordinates(nextLatitude, nextLongitude);
   }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -142,12 +208,33 @@ export function ReportForm({ userId }: ReportFormProps) {
       longitude,
     });
 
+    const isStep1Complete =
+      hasSelectedLocation &&
+      !validation.fieldErrors.latitude &&
+      !validation.fieldErrors.longitude;
+    const isStep2Complete =
+      !validation.fieldErrors.description &&
+      !validation.fieldErrors.address &&
+      description.trim().length >= REPORT_DESCRIPTION_MIN_LENGTH;
+
+    if (!isStep1Complete || !isStep2Complete) {
+      setFieldErrors(validation.fieldErrors);
+      setPendingStepAlert(
+        [
+          !isStep1Complete ? "Шаг 1: отметь точку на карте." : null,
+          !isStep2Complete ? "Шаг 2: заполни описание обращения." : null,
+        ].filter((item): item is string => Boolean(item)),
+      );
+      return;
+    }
+
     if (!validation.data) {
       setFieldErrors(validation.fieldErrors);
       return;
     }
 
     setFieldErrors({});
+    setPendingStepAlert(null);
     setIsSubmitting(true);
 
     try {
@@ -207,17 +294,47 @@ export function ReportForm({ userId }: ReportFormProps) {
     setIsSubmitting(false);
   }
 
+  const isStep1Complete =
+    hasSelectedLocation &&
+    !fieldErrors.latitude &&
+    !fieldErrors.longitude &&
+    latitude.trim().length > 0 &&
+    longitude.trim().length > 0;
+  const isStep2Complete =
+    description.trim().length >= REPORT_DESCRIPTION_MIN_LENGTH &&
+    !fieldErrors.description &&
+    !fieldErrors.address;
+
   return (
     <form className="mt-6 flex flex-col gap-4 lg:mt-0 lg:gap-5" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch">
         <section className="rounded-[28px] border border-[#d4e4d2] bg-[#f7fbf6] p-4 shadow-sm lg:flex lg:h-full lg:flex-col lg:p-5">
           <div className="mb-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6c8770]">
-              Шаг 1
-            </p>
-            <h2 className="mt-2 text-xl font-semibold text-primary-dark">
-              Отметь точку на карте
-            </h2>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6c8770]">
+                  Шаг 1
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-primary-dark">
+                  Отметь точку на карте
+                </h2>
+              </div>
+
+              <div
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                  isStep1Complete
+                    ? "bg-[#dff3e1] text-[#1f7a35]"
+                    : "bg-[#fff4db] text-[#936312]"
+                }`}
+              >
+                {isStep1Complete ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                {isStep1Complete ? "Выполнено" : "Обязательный"}
+              </div>
+            </div>
             <p className="mt-2 text-sm leading-6 text-foreground/70">
               Нажми на карту, чтобы поставить точку проблемы. Координаты ниже
               обновятся автоматически.
@@ -240,6 +357,7 @@ export function ReportForm({ userId }: ReportFormProps) {
                 type="text"
                 value={latitude}
                 onChange={(event) => {
+                  setHasSelectedLocation(true);
                   setLatitude(event.target.value);
                   setFieldErrors((current) => ({ ...current, latitude: undefined }));
                 }}
@@ -260,6 +378,7 @@ export function ReportForm({ userId }: ReportFormProps) {
                 type="text"
                 value={longitude}
                 onChange={(event) => {
+                  setHasSelectedLocation(true);
                   setLongitude(event.target.value);
                   setFieldErrors((current) => ({ ...current, longitude: undefined }));
                 }}
@@ -278,12 +397,31 @@ export function ReportForm({ userId }: ReportFormProps) {
         <div className="flex flex-col gap-4 lg:h-full">
           <section className="rounded-[28px] border border-[#d4e4d2] bg-[#f7fbf6] p-4 shadow-sm lg:h-full lg:p-5">
             <div className="flex flex-col gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6c8770]">
-                Шаг 2
-              </p>
-              <h2 className="text-xl font-semibold text-primary-dark">
-                Опиши обращение
-              </h2>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6c8770]">
+                    Шаг 2
+                  </p>
+                  <h2 className="mt-2 text-xl font-semibold text-primary-dark">
+                    Опиши обращение
+                  </h2>
+                </div>
+
+                <div
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                    isStep2Complete
+                      ? "bg-[#dff3e1] text-[#1f7a35]"
+                      : "bg-[#fff4db] text-[#936312]"
+                  }`}
+                >
+                  {isStep2Complete ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4" />
+                  )}
+                  {isStep2Complete ? "Выполнено" : "Обязательный"}
+                </div>
+              </div>
               <p className="text-sm leading-6 text-foreground/70">
                 Укажи тип проблемы, коротко опиши ситуацию и добавь адрес, чтобы
                 модератору было проще быстро среагировать.
@@ -339,7 +477,9 @@ export function ReportForm({ userId }: ReportFormProps) {
                   type="text"
                   value={address}
                   onChange={(event) => {
+                    isAddressManuallyEditedRef.current = true;
                     setAddress(event.target.value);
+                    setAddressLookupError("");
                     setFieldErrors((current) => ({ ...current, address: undefined }));
                   }}
                   placeholder="Павлодар, район ТД"
@@ -349,6 +489,14 @@ export function ReportForm({ userId }: ReportFormProps) {
                 />
                 {fieldErrors.address ? (
                   <p className="text-xs text-red-700">{fieldErrors.address}</p>
+                ) : null}
+                {!fieldErrors.address && isResolvingAddress ? (
+                  <p className="text-xs text-foreground/60">
+                    Определяем адрес по точке на карте...
+                  </p>
+                ) : null}
+                {!fieldErrors.address && !isResolvingAddress && addressLookupError ? (
+                  <p className="text-xs text-amber-700">{addressLookupError}</p>
                 ) : null}
               </label>
             </div>
@@ -449,6 +597,44 @@ export function ReportForm({ userId }: ReportFormProps) {
           </div>
         </div>
       </section>
+
+      {pendingStepAlert ? (
+        <div className="fixed inset-0 z-[1300] flex items-center justify-center bg-[#173a20]/35 px-4">
+          <div className="w-full max-w-md rounded-[28px] border border-[#d4e4d2] bg-white p-5 shadow-[0_24px_80px_rgba(33,72,43,0.18)]">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 rounded-full bg-[#fff4db] p-2 text-[#936312]">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-primary-dark">
+                  Заверши обязательные шаги
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-foreground/70">
+                  Перед отправкой нужно выполнить все обязательные шаги формы.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2 rounded-[20px] bg-[#f7fbf6] p-4">
+              {pendingStepAlert.map((item) => (
+                <p key={item} className="text-sm font-medium text-foreground/80">
+                  {item}
+                </p>
+              ))}
+            </div>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setPendingStepAlert(null)}
+                className="rounded-2xl bg-primary px-5 py-3 font-semibold text-white transition hover:bg-primary-dark"
+              >
+                Понятно
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }

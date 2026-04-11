@@ -1,5 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
+
 function getSupabaseUrl() {
   const value = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -21,8 +23,19 @@ function getSupabasePublishableKey() {
 }
 
 export function createSupabaseBrowserClient() {
-  return createBrowserClient(
-    getSupabaseUrl(),
-    getSupabasePublishableKey(),
-  );
+  if (typeof window === "undefined") {
+    return createBrowserClient(
+      getSupabaseUrl(),
+      getSupabasePublishableKey(),
+    );
+  }
+
+  if (!browserClient) {
+    browserClient = createBrowserClient(
+      getSupabaseUrl(),
+      getSupabasePublishableKey(),
+    );
+  }
+
+  return browserClient;
 }
