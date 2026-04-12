@@ -350,9 +350,8 @@ export function MainRedesignPreview({
                 <DemoBadge />
               </span>
             </Link>
-            <button
-              type="button"
-              onClick={() => openDemo("nav", "Раздел «Сообщество» находится в разработке.")}
+            <Link
+              href="/community"
               className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
             >
               <span className="flex items-center gap-0 lg:gap-3">
@@ -362,7 +361,7 @@ export function MainRedesignPreview({
               <span className="hidden lg:inline-flex">
                 <DemoBadge />
               </span>
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -456,13 +455,12 @@ export function MainRedesignPreview({
                     ))}
                   </>
                 )}
-                <button
-                  type="button"
-                  onClick={() => openDemo("community", "Инициативы сообщества находятся в разработке.")}
+                <Link
+                  href="/community"
                   className="mx-auto flex w-fit rounded-[18px] border border-[#d4e4d2] bg-white px-5 py-1.5 text-[14px] font-medium text-[#6b6659] transition hover:bg-[#f6faf5]"
                 >
                   Предложить инициативу
-                </button>
+                </Link>
               </div>
             </section>
           </div>
@@ -610,10 +608,17 @@ export function MainRedesignPreview({
             ) : (
               <section className="rounded-[30px] border border-[#d4e4d2] bg-white px-4 py-4 shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
-                    <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
+                  <Link
+                    href="/statistics"
+                    className="group inline-flex items-center gap-2 text-[18px] font-semibold text-[#12351d] transition hover:text-[#2f8734]"
+                  >
+                    <BarChart3
+                      size={20}
+                      className="text-[#2f8734] transition group-hover:scale-[1.04]"
+                      strokeWidth={2}
+                    />
                     <span>Статистика</span>
-                  </h2>
+                  </Link>
                   <DemoBadge />
                 </div>
                 <p className="mt-2 text-sm text-[#587160]">
