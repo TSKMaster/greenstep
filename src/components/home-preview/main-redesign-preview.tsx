@@ -198,7 +198,7 @@ export function MainRedesignPreview({
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(237,243,238,0.44),rgba(237,243,238,0.62))]" />
       <div className="relative z-10 mx-auto w-full max-w-[1440px]">
-        <header className="rounded-[28px] border border-[#c9ddc7] bg-[#4f9663] px-3 py-3 shadow-[0_14px_30px_rgba(52,102,65,0.15)] sm:px-4 lg:rounded-[32px] lg:py-2">
+        <header className="rounded-[28px] border border-[#2a7a2f] bg-[#2f8734] px-3 py-3 shadow-[0_14px_30px_rgba(47,135,52,0.22)] sm:px-4 lg:rounded-[32px] lg:py-2">
           <div className="flex flex-nowrap items-center justify-between gap-3">
             <div className="flex items-center justify-start">
               <div className="flex items-center gap-0">
@@ -230,7 +230,7 @@ export function MainRedesignPreview({
                     className="flex h-[50px] w-[50px] shrink-0 items-center justify-center self-center rounded-full p-[5px] sm:h-[58px] sm:w-[58px] sm:p-[6px]"
                     style={getGaugeStyle(ecoIndex)}
                   >
-                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#4f9663] text-[#f7fbf3]">
+                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#2f8734] text-[#f7fbf3]">
                       <p className="text-[16px] font-semibold leading-none sm:text-[18px]">{ecoIndex}</p>
                       <p className="mt-0.5 text-[6px] font-semibold uppercase tracking-[0.12em] text-[#f0fbef] sm:text-[7px]">
                         {ecoLabel}
@@ -305,7 +305,7 @@ export function MainRedesignPreview({
           </div>
         ) : null}
 
-        <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#c9ddc7] bg-[#4f9663] px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
+        <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#2a7a2f] bg-[#2f8734] px-2 py-2 shadow-[0_18px_40px_rgba(47,135,52,0.22)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
           <div className="grid grid-cols-5 gap-2 lg:gap-3">
             <Link
               href={buildMainHref({
@@ -676,13 +676,12 @@ export function MainRedesignPreview({
                     Хочу участвовать
                   </Link>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => openDemo("challenge", "Раздел с наградами находится в разработке.")}
+                  <Link
+                    href="/tasks"
                     className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
                   >
                     Подробнее
-                  </button>
+                  </Link>
                 )}
               </div>
             </section>

@@ -16,6 +16,7 @@ type AppShellChromeProps = {
   email: string;
   isAdmin: boolean;
   rating: number;
+  titleBadge?: string | null;
   title?: string;
 };
 
@@ -40,6 +41,7 @@ export function AppShellChrome({
   email,
   isAdmin,
   rating,
+  titleBadge,
   title,
 }: AppShellChromeProps) {
   const navItems: NavItem[] = [
@@ -73,7 +75,7 @@ export function AppShellChrome({
 
   return (
     <>
-      <header className="rounded-[28px] border border-[#c9ddc7] bg-[#4f9663] px-3 py-3 shadow-[0_14px_30px_rgba(52,102,65,0.15)] sm:px-4 lg:rounded-[32px] lg:py-2">
+      <header className="rounded-[28px] border border-[#2a7a2f] bg-[#2f8734] px-3 py-3 shadow-[0_14px_30px_rgba(47,135,52,0.22)] sm:px-4 lg:rounded-[32px] lg:py-2">
         <div className="flex flex-nowrap items-center justify-between gap-3">
           <div className="flex items-center justify-start">
             <div className="flex items-center gap-0">
@@ -94,9 +96,16 @@ export function AppShellChrome({
 
           <div className="hidden min-w-0 justify-center lg:flex lg:flex-1">
             {title ? (
-              <h1 className="truncate text-[24px] font-semibold tracking-[-0.04em] text-[#f7fbf3]">
-                {title}
-              </h1>
+              <div className="flex min-w-0 items-center gap-3">
+                <h1 className="truncate text-[24px] font-semibold tracking-[-0.04em] text-[#f7fbf3]">
+                  {title}
+                </h1>
+                {titleBadge ? (
+                  <span className="inline-flex shrink-0 rounded-full border border-white/30 bg-white/14 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#f7fbf3]">
+                    {titleBadge}
+                  </span>
+                ) : null}
+              </div>
             ) : null}
           </div>
 
@@ -118,7 +127,7 @@ export function AppShellChrome({
         </div>
       </header>
 
-      <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#c9ddc7] bg-[#4f9663] px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
+      <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#2a7a2f] bg-[#2f8734] px-2 py-2 shadow-[0_18px_40px_rgba(47,135,52,0.22)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
         <div className="grid grid-cols-5 gap-2 lg:gap-3">
           {navItems.map((item) =>
             item.href ? (
