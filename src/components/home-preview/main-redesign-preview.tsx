@@ -338,25 +338,31 @@ export function MainRedesignPreview({
                 <span className="hidden lg:inline">Все заявки</span>
               </span>
             </Link>
-            {[
-              ["Обучение", <BookOpenText key="learn" size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />],
-              ["Сообщество", <Users key="community" size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />],
-            ].map(([item, iconNode]) => (
-              <button
-                key={item as string}
-                type="button"
-                onClick={() => openDemo("nav", `Раздел «${item as string}» находится в разработке.`)}
-                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
-              >
-                <span className="flex items-center gap-0 lg:gap-3">
-                  {iconNode}
-                  <span className="hidden lg:inline">{item as string}</span>
-                </span>
-                <span className="hidden lg:inline-flex">
-                  <DemoBadge />
-                </span>
-              </button>
-            ))}
+            <Link
+              href="/learning"
+              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+            >
+              <span className="flex items-center gap-0 lg:gap-3">
+                <BookOpenText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                <span className="hidden lg:inline">Обучение</span>
+              </span>
+              <span className="hidden lg:inline-flex">
+                <DemoBadge />
+              </span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => openDemo("nav", "Раздел «Сообщество» находится в разработке.")}
+              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+            >
+              <span className="flex items-center gap-0 lg:gap-3">
+                <Users size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                <span className="hidden lg:inline">Сообщество</span>
+              </span>
+              <span className="hidden lg:inline-flex">
+                <DemoBadge />
+              </span>
+            </button>
           </div>
         </section>
 

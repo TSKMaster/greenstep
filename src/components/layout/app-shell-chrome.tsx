@@ -55,15 +55,19 @@ export function AppShellChrome({
       href: "/map",
       icon: <MapPinned size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Карта",
+      isActive: title === "Карта обращений",
     },
     {
       href: "/reports",
       icon: <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Все заявки",
+      isActive: title === "Все заявки",
     },
     {
+      href: "/learning",
       icon: <BookOpenText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Обучение",
+      isActive: title === "Обучение",
       isDemo: true,
     },
     {
