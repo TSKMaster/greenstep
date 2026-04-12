@@ -21,10 +21,10 @@ type AppShellChromeProps = {
 
 type NavItem = {
   href?: string;
+  icon: ReactNode;
   isActive?: boolean;
   isDemo?: boolean;
   label: string;
-  icon: ReactNode;
 };
 
 function DemoBadge() {
@@ -45,27 +45,27 @@ export function AppShellChrome({
   const navItems: NavItem[] = [
     {
       href: "/",
-      icon: <House size={20} className="text-[#173221]" strokeWidth={2} />,
+      icon: <House size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Главная",
       isActive: !title,
     },
     {
       href: "/map",
-      icon: <MapPinned size={20} className="text-[#173221]" strokeWidth={2} />,
+      icon: <MapPinned size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Карта",
     },
     {
       href: "/reports",
-      icon: <FileText size={20} className="text-[#173221]" strokeWidth={2} />,
+      icon: <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Все заявки",
     },
     {
-      icon: <BookOpenText size={20} className="text-[#173221]" strokeWidth={2} />,
+      icon: <BookOpenText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Обучение",
       isDemo: true,
     },
     {
-      icon: <Users size={20} className="text-[#173221]" strokeWidth={2} />,
+      icon: <Users size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Сообщество",
       isDemo: true,
     },
@@ -118,7 +118,7 @@ export function AppShellChrome({
         </div>
       </header>
 
-      <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#cfe0cd] bg-white/96 px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
+      <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#c9ddc7] bg-[#4f9663] px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
         <div className="grid grid-cols-5 gap-2 lg:gap-3">
           {navItems.map((item) =>
             item.href ? (
@@ -127,8 +127,8 @@ export function AppShellChrome({
                 href={item.href}
                 className={
                   item.isActive
-                    ? "flex items-center justify-center rounded-[18px] border border-[#b7e8c1] bg-[#d9f6de] px-2 py-3 text-[15px] font-semibold text-[#12351d] shadow-[inset_1px_0_0_#1bc36a] lg:justify-between lg:px-4 lg:py-2"
-                    : "flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
+                    ? "flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-semibold text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:border-[#b7e8c1] lg:bg-[#d9f6de] lg:px-4 lg:py-2 lg:text-[#12351d] lg:shadow-[inset_1px_0_0_#1bc36a]"
+                    : "flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
                 }
               >
                 <span className="flex items-center gap-0 lg:gap-3">
@@ -141,7 +141,7 @@ export function AppShellChrome({
               <button
                 key={item.label}
                 type="button"
-                className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] lg:justify-between lg:px-4 lg:py-2"
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
               >
                 <span className="flex items-center gap-0 lg:gap-3">
                   {item.icon}

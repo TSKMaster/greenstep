@@ -305,7 +305,7 @@ export function MainRedesignPreview({
           </div>
         ) : null}
 
-        <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#cfe0cd] bg-white/96 px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
+        <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#c9ddc7] bg-[#4f9663] px-2 py-2 shadow-[0_18px_40px_rgba(59,94,57,0.16)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
           <div className="grid grid-cols-5 gap-2 lg:gap-3">
             <Link
               href={buildMainHref({
@@ -313,40 +313,40 @@ export function MainRedesignPreview({
                 previewModeEnabled,
                 viewerMode: isGuestView ? "guest" : "authorized",
               })}
-              className="flex items-center justify-center rounded-[18px] border border-[#b7e8c1] bg-[#d9f6de] px-2 py-3 text-[15px] font-semibold text-[#12351d] shadow-[inset_1px_0_0_#1bc36a] lg:justify-between lg:px-4 lg:py-2"
+              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-semibold text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:border-[#b7e8c1] lg:bg-[#d9f6de] lg:px-4 lg:py-2 lg:text-[#12351d] lg:shadow-[inset_1px_0_0_#1bc36a]"
             >
               <span className="flex items-center gap-0 lg:gap-3">
-                <House size={20} className="text-[#12351d]" strokeWidth={2} />
+                <House size={24} className="text-[#f7fbf3] lg:text-[#12351d]" strokeWidth={2.2} />
                 <span className="hidden lg:inline">Главная</span>
               </span>
             </Link>
             <Link
               href="/map"
-              className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
+              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
             >
               <span className="flex items-center gap-0 lg:gap-3">
-                <MapPinned size={20} className="text-[#173221]" strokeWidth={2} />
+                <MapPinned size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
                 <span className="hidden lg:inline">Карта</span>
               </span>
             </Link>
             <Link
               href="/reports"
-              className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
+              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
             >
               <span className="flex items-center gap-0 lg:gap-3">
-                <FileText size={20} className="text-[#173221]" strokeWidth={2} />
+                <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
                 <span className="hidden lg:inline">Все заявки</span>
               </span>
             </Link>
             {[
-              ["Обучение", <BookOpenText key="learn" size={20} className="text-[#173221]" strokeWidth={2} />],
-              ["Сообщество", <Users key="community" size={20} className="text-[#173221]" strokeWidth={2} />],
+              ["Обучение", <BookOpenText key="learn" size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />],
+              ["Сообщество", <Users key="community" size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />],
             ].map(([item, iconNode]) => (
               <button
                 key={item as string}
                 type="button"
                 onClick={() => openDemo("nav", `Раздел «${item as string}» находится в разработке.`)}
-                className="flex items-center justify-center rounded-[18px] bg-[#f3f7f1] px-2 py-3 text-left text-[15px] font-medium text-[#173221] transition hover:bg-[#edf4ea] lg:justify-between lg:px-4 lg:py-2"
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
               >
                 <span className="flex items-center gap-0 lg:gap-3">
                   {iconNode}
