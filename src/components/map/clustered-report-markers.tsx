@@ -83,6 +83,18 @@ function buildPreviewReportHref(
   return `${basePath}?${params.toString()}`;
 }
 
+function buildGuestAuthTrigger(label: string) {
+  return `
+    <button
+      type="button"
+      class="preview-report-popup__link preview-report-popup__link--primary"
+      onclick="window.dispatchEvent(new CustomEvent('greenstep:guest-auth-required')); return false;"
+    >
+      ${label}
+    </button>
+  `;
+}
+
 function buildReportPopupMarkup({
   report,
   currentUserId,
@@ -104,18 +116,12 @@ function buildReportPopupMarkup({
   const detailsHref = currentUserId
     ? `/reports/${report.id}`
     : buildPreviewReportHref(report.id, basePath, previewModeEnabled);
-  const signInHref = "/auth/sign-in";
   const isOwnReport = Boolean(currentUserId && report.user_id === currentUserId);
   const isGuest = !currentUserId;
   const actions = isOwnReport
     ? `<a class="preview-report-popup__link preview-report-popup__link--primary" href="${detailsHref}">Перейти</a>`
     : isGuest
-      ? `
-      <div class="preview-report-popup__actions">
-        <a class="preview-report-popup__link preview-report-popup__link--ghost" href="${detailsHref}">Открыть в preview</a>
-        <a class="preview-report-popup__link preview-report-popup__link--primary" href="${signInHref}">Войти и поддержать</a>
-      </div>
-    `
+      ? buildGuestAuthTrigger("Открыть заявку")
       : `
       <div class="preview-report-popup__actions">
         <a class="preview-report-popup__link preview-report-popup__link--ghost" href="${detailsHref}">Перейти</a>

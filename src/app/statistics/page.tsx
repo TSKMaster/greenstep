@@ -148,7 +148,10 @@ function DonutChart({ data }: { data: { label: string; value: number }[] }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)] lg:items-center">
-      <div className="mx-auto flex h-[170px] w-[170px] items-center justify-center rounded-full" style={{ background: `conic-gradient(${gradient})` }}>
+      <div
+        className="mx-auto flex h-[170px] w-[170px] items-center justify-center rounded-full border border-white/70 bg-white/70 shadow-[0_18px_40px_rgba(59,94,57,0.12)] backdrop-blur-[2px]"
+        style={{ background: `conic-gradient(${gradient})` }}
+      >
         <div className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-white text-center">
           <div>
             <p className="text-[11px] uppercase tracking-[0.12em] text-[#6c8770]">Всего</p>

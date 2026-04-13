@@ -1,6 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Bell,
   BookOpenText,
@@ -14,6 +16,7 @@ import { HeaderUserMenu } from "@/components/layout/header-user-menu";
 type AppShellChromeProps = {
   displayName?: string | null;
   email: string;
+  isGuest?: boolean;
   isAdmin: boolean;
   rating: number;
   titleBadge?: string | null;
@@ -26,6 +29,7 @@ type NavItem = {
   isActive?: boolean;
   isDemo?: boolean;
   label: string;
+  requiresAuth?: boolean;
 };
 
 function DemoBadge() {
@@ -36,14 +40,49 @@ function DemoBadge() {
   );
 }
 
+function GuestAuthModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[1500] flex items-center justify-center bg-[#173a20]/35 px-4">
+      <div className="w-full max-w-md rounded-[28px] border border-[#d4e4d2] bg-white p-6 shadow-[0_24px_80px_rgba(33,72,43,0.18)]">
+        <h3 className="text-[24px] font-semibold tracking-[-0.04em] text-[#12351d]">
+          Нужно войти в GreenStep
+        </h3>
+        <p className="mt-3 text-sm leading-6 text-[#587160]">
+          Чтобы использовать данную функцию приложения, необходимо войти.
+        </p>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center justify-center rounded-2xl border border-[#d4e4d2] px-4 py-3 font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+          >
+            Позже
+          </button>
+          <Link
+            href="/auth/sign-in"
+            onClick={onClose}
+            className="inline-flex items-center justify-center rounded-2xl bg-[#2f8734] px-4 py-3 font-semibold text-white transition hover:bg-[#286f2c]"
+            style={{ color: "#ffffff" }}
+          >
+            Войти
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AppShellChrome({
   displayName,
   email,
+  isGuest = false,
   isAdmin,
   rating,
   titleBadge,
   title,
 }: AppShellChromeProps) {
+  const [guestAuthModalOpen, setGuestAuthModalOpen] = useState(false);
+
   const navItems: NavItem[] = [
     {
       href: "/",
@@ -62,6 +101,7 @@ export function AppShellChrome({
       icon: <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />,
       label: "Все заявки",
       isActive: title === "Все заявки",
+      requiresAuth: true,
     },
     {
       href: "/learning",
@@ -69,6 +109,7 @@ export function AppShellChrome({
       label: "Обучение",
       isActive: title === "Обучение",
       isDemo: true,
+      requiresAuth: true,
     },
     {
       href: "/community",
@@ -76,8 +117,14 @@ export function AppShellChrome({
       label: "Сообщество",
       isActive: title === "Сообщество",
       isDemo: true,
+      requiresAuth: true,
     },
   ];
+
+  const itemClass = (isActive?: boolean) =>
+    isActive
+      ? "flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-semibold text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:border-[#b7e8c1] lg:bg-[#d9f6de] lg:px-4 lg:py-2 lg:text-[#12351d] lg:shadow-[inset_1px_0_0_#1bc36a]"
+      : "flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]";
 
   return (
     <>
@@ -116,44 +163,66 @@ export function AppShellChrome({
           </div>
 
           <div className="flex min-w-0 items-center justify-end gap-2 sm:flex-nowrap">
-            <HeaderUserMenu
-              displayName={displayName}
-              email={email}
-              isAdmin={isAdmin}
-              rating={rating}
-            />
-            <button
-              type="button"
-              className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
-              aria-label="Уведомления"
-            >
-              <Bell size={20} className="text-[#f7fbf3]" strokeWidth={2} />
-            </button>
+            {isGuest ? (
+              <Link
+                href="/auth/sign-in"
+                className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white px-5 py-3 text-[15px] font-semibold text-[#1d5b2b] transition hover:bg-[#edf7ea]"
+              >
+                Вход
+              </Link>
+            ) : (
+              <>
+                <HeaderUserMenu
+                  displayName={displayName}
+                  email={email}
+                  isAdmin={isAdmin}
+                  rating={rating}
+                />
+                <button
+                  type="button"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
+                  aria-label="Уведомления"
+                >
+                  <Bell size={20} className="text-[#f7fbf3]" strokeWidth={2} />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
 
       <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#2a7a2f] bg-[#2f8734] px-2 py-2 shadow-[0_18px_40px_rgba(47,135,52,0.22)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
         <div className="grid grid-cols-5 gap-2 lg:gap-3">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href ?? "#"}
-              className={
-                item.isActive
-                  ? "flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-semibold text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:border-[#b7e8c1] lg:bg-[#d9f6de] lg:px-4 lg:py-2 lg:text-[#12351d] lg:shadow-[inset_1px_0_0_#1bc36a]"
-                  : "flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
-              }
-            >
-              <span className="flex items-center gap-0 lg:gap-3">
-                {item.icon}
-                <span className="hidden lg:inline">{item.label}</span>
-              </span>
-              {item.isDemo ? <DemoBadge /> : null}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            isGuest && item.requiresAuth ? (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => setGuestAuthModalOpen(true)}
+                className={itemClass(item.isActive)}
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  {item.icon}
+                  <span className="hidden lg:inline">{item.label}</span>
+                </span>
+                {item.isDemo ? <DemoBadge /> : null}
+              </button>
+            ) : (
+              <Link key={item.label} href={item.href ?? "#"} className={itemClass(item.isActive)}>
+                <span className="flex items-center gap-0 lg:gap-3">
+                  {item.icon}
+                  <span className="hidden lg:inline">{item.label}</span>
+                </span>
+                {item.isDemo ? <DemoBadge /> : null}
+              </Link>
+            ),
+          )}
         </div>
       </section>
+
+      {isGuest && guestAuthModalOpen ? (
+        <GuestAuthModal onClose={() => setGuestAuthModalOpen(false)} />
+      ) : null}
     </>
   );
 }

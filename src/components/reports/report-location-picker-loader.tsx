@@ -18,8 +18,8 @@ const ReportLocationPicker = dynamic(
 );
 
 type ReportLocationPickerLoaderProps = {
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   onChange: (nextLatitude: number, nextLongitude: number) => void;
 };
 

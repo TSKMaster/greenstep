@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { AppShellChrome } from "@/components/layout/app-shell-chrome";
 import { ReportsMapLoader } from "@/components/map/reports-map-loader";
 import { getCurrentUserWithProfile } from "@/lib/auth";
@@ -7,12 +6,8 @@ import type { ReportListItem } from "@/types";
 
 export default async function MapPage() {
   const { profile, user } = await getCurrentUserWithProfile();
-
-  if (!user) {
-    redirect("/auth/sign-in");
-  }
-
-  const email = user.email ?? profile?.email ?? "";
+  const isGuest = !user;
+  const email = user?.email ?? profile?.email ?? "guest@greenstep.local";
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -37,8 +32,9 @@ export default async function MapPage() {
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(237,243,238,0.44),rgba(237,243,238,0.62))]" />
       <div className="relative z-10 mx-auto w-full max-w-[1440px]">
         <AppShellChrome
-          displayName={profile?.full_name ?? user.user_metadata?.full_name ?? null}
+          displayName={profile?.full_name ?? user?.user_metadata?.full_name ?? null}
           email={email}
+          isGuest={isGuest}
           isAdmin={Boolean(profile?.is_admin)}
           rating={profile?.rating ?? 0}
           title="Карта обращений"
@@ -46,7 +42,7 @@ export default async function MapPage() {
 
         <section className="mt-3 mx-auto w-full rounded-[28px] border border-border bg-surface p-4 shadow-sm lg:rounded-[32px] lg:border-[#d4e4d2] lg:bg-white lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)]">
           <ReportsMapLoader
-            currentUserId={user.id}
+            currentUserId={user?.id ?? null}
             reports={reports}
             showCreateCta
           />

@@ -33,6 +33,7 @@ type PreviewReportsMapProps = {
   currentUserId: string | null;
   expandHref: string;
   expandLabel: string;
+  onExpandClick?: (() => void) | null;
   previewModeEnabled: boolean;
   reports: ReportListItem[];
 };
@@ -42,6 +43,7 @@ export function PreviewReportsMap({
   currentUserId,
   expandHref,
   expandLabel,
+  onExpandClick,
   previewModeEnabled,
   reports,
 }: PreviewReportsMapProps) {
@@ -92,12 +94,22 @@ export function PreviewReportsMap({
             reports={filteredReports}
           />
         </MapContainer>
-        <Link
-          href={expandHref}
-          className="absolute right-5 bottom-5 z-[700] rounded-full border border-[#d4e4d2] bg-white/96 px-4 py-2 text-sm font-semibold text-[#28452e] shadow-sm transition hover:bg-[#f6faf5]"
-        >
-          {expandLabel}
-        </Link>
+        {onExpandClick ? (
+          <button
+            type="button"
+            onClick={onExpandClick}
+            className="absolute right-5 bottom-5 z-[700] rounded-full border border-[#d4e4d2] bg-white/96 px-4 py-2 text-sm font-semibold text-[#28452e] shadow-sm transition hover:bg-[#f6faf5]"
+          >
+            {expandLabel}
+          </button>
+        ) : (
+          <Link
+            href={expandHref}
+            className="absolute right-5 bottom-5 z-[700] rounded-full border border-[#d4e4d2] bg-white/96 px-4 py-2 text-sm font-semibold text-[#28452e] shadow-sm transition hover:bg-[#f6faf5]"
+          >
+            {expandLabel}
+          </Link>
+        )}
       </div>
       <div className="lg:hidden">
         <ReportMapLegend

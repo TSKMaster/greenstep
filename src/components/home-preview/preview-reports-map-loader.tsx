@@ -21,6 +21,7 @@ type PreviewReportsMapLoaderProps = {
   currentUserId: string | null;
   expandHref: string;
   expandLabel: string;
+  onExpandClick?: (() => void) | null;
   previewModeEnabled: boolean;
   reports: ReportListItem[];
 };
@@ -30,6 +31,7 @@ export function PreviewReportsMapLoader({
   currentUserId,
   expandHref,
   expandLabel,
+  onExpandClick,
   previewModeEnabled,
   reports,
 }: PreviewReportsMapLoaderProps) {
@@ -39,6 +41,7 @@ export function PreviewReportsMapLoader({
       currentUserId={currentUserId}
       expandHref={expandHref}
       expandLabel={expandLabel}
+      onExpandClick={onExpandClick}
       previewModeEnabled={previewModeEnabled}
       reports={reports}
     />

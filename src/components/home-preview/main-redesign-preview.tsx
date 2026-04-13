@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   Bell,
@@ -42,10 +42,9 @@ type MainRedesignPreviewProps = {
   viewerMode: "guest" | "authorized";
 };
 
-type DemoArea = "challenge" | "community" | "nav";
 
-type DemoMessage = {
-  area: DemoArea;
+type GuestAuthModalState = {
+  title: string;
   text: string;
 } | null;
 
@@ -101,7 +100,6 @@ export function MainRedesignPreview({
   ecoIndex,
   ecoLabel,
   email,
-  initialSelectedReportId,
   isAdmin,
   myReports,
   myResolvedReports,
@@ -113,25 +111,11 @@ export function MainRedesignPreview({
   totalReports,
   viewerMode,
 }: MainRedesignPreviewProps) {
-  const [demoMessage, setDemoMessage] = useState<DemoMessage>(null);
+  const [guestAuthModal, setGuestAuthModal] = useState<GuestAuthModalState>(null);
   const isGuestView = viewerMode === "guest";
-  const selectedGuestReport =
-    reports.find((report) => report.id === initialSelectedReportId) ?? reports[0] ?? null;
   const signInHref = "/auth/sign-in";
   const primaryCtaHref = isGuestView ? signInHref : "/reports/new";
   const secondaryCtaHref = isGuestView ? signInHref : "/my-reports";
-  const guestMapExpandHref = selectedGuestReport
-    ? buildMainHref({
-        basePath,
-        previewModeEnabled,
-        reportId: selectedGuestReport.id,
-        viewerMode: "guest",
-      })
-    : buildMainHref({
-        basePath,
-        previewModeEnabled,
-        viewerMode: "guest",
-      });
   const reportSummaryItems = isGuestView
     ? [
         {
@@ -186,9 +170,29 @@ export function MainRedesignPreview({
         },
       ];
 
-  function openDemo(area: DemoArea, text: string) {
-    setDemoMessage({ area, text });
+
+  function openGuestAuthModal() {
+    setGuestAuthModal({
+      title: "Нужно войти в GreenStep",
+      text: "Чтобы использовать данную функцию приложения, необходимо войти.",
+    });
   }
+
+  useEffect(() => {
+    if (!isGuestView) {
+      return;
+    }
+
+    function handleGuestAuthRequired() {
+      openGuestAuthModal();
+    }
+
+    window.addEventListener("greenstep:guest-auth-required", handleGuestAuthRequired);
+
+    return () => {
+      window.removeEventListener("greenstep:guest-auth-required", handleGuestAuthRequired);
+    };
+  }, [isGuestView]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#edf3ee] px-3 py-3 pb-28 sm:px-4 sm:py-4 sm:pb-32 lg:px-6 lg:py-6 lg:pb-6">
@@ -226,15 +230,17 @@ export function MainRedesignPreview({
                   </p>
                 </div>
                 <div className="grid h-full grid-cols-[54px_minmax(0,1fr)] items-center gap-2 pb-1.5 pt-1.5 sm:grid-cols-[60px_minmax(0,1fr)] sm:gap-3">
-                  <div
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center self-center rounded-full p-[5px] sm:h-[58px] sm:w-[58px] sm:p-[6px]"
-                    style={getGaugeStyle(ecoIndex)}
-                  >
-                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#2f8734] text-[#f7fbf3]">
+                  <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center self-center rounded-full border border-white/20 bg-white/10 p-[3px] shadow-[0_10px_24px_rgba(12,38,20,0.16)] sm:h-[66px] sm:w-[66px] sm:p-[4px]">
+                    <div
+                      className="flex h-full w-full items-center justify-center rounded-full p-[5px] sm:p-[6px]"
+                      style={getGaugeStyle(ecoIndex)}
+                    >
+                      <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#2f8734] text-[#f7fbf3]">
                       <p className="text-[16px] font-semibold leading-none sm:text-[18px]">{ecoIndex}</p>
                       <p className="mt-0.5 text-[6px] font-semibold uppercase tracking-[0.12em] text-[#f0fbef] sm:text-[7px]">
                         {ecoLabel}
                       </p>
+                      </div>
                     </div>
                   </div>
 
@@ -264,20 +270,12 @@ export function MainRedesignPreview({
 
             <div className="flex min-w-0 items-center justify-end gap-2 sm:flex-nowrap">
               {isGuestView ? (
-                <>
-                  <Link
-                    href={signInHref}
-                    className="rounded-full border border-white/30 bg-white/14 px-3 py-2 text-xs font-semibold text-[#f7fbf3] transition hover:bg-white/20 sm:px-4 sm:text-sm"
-                  >
-                    Вход
-                  </Link>
-                  <Link
-                    href={signInHref}
-                    className="rounded-full bg-[#f7fbf3] px-3 py-2 text-xs font-semibold text-[#1d5b2b] transition hover:bg-[#edf7ea] sm:px-4 sm:text-sm"
-                  >
-                    Регистрация
-                  </Link>
-                </>
+                <Link
+                  href={signInHref}
+                  className="rounded-full border border-white/35 bg-white px-3 py-2 text-xs font-semibold text-[#1d5b2b] transition hover:bg-[#edf7ea] sm:px-4 sm:text-sm"
+                >
+                  Вход
+                </Link>
               ) : (
                 <>
                   <HeaderUserMenu
@@ -288,8 +286,8 @@ export function MainRedesignPreview({
                   />
                   <button
                     type="button"
-                    onClick={() => openDemo("nav", "Уведомления находятся в разработке.")}
                     className="grid h-9 w-9 place-items-center rounded-full border border-white/35 bg-white/18 text-[#f7fbf3] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-white/24"
+                    aria-label="Уведомления"
                   >
                     <Bell size={20} className="text-[#f7fbf3]" strokeWidth={2} />
                   </button>
@@ -298,12 +296,6 @@ export function MainRedesignPreview({
             </div>
           </div>
         </header>
-
-        {demoMessage ? (
-          <div className="mt-3 rounded-[24px] border border-[#d4e4d2] bg-[#f7fbf6] px-4 py-3 text-sm text-[#35533c] shadow-sm">
-            {demoMessage.text}
-          </div>
-        ) : null}
 
         <section className="fixed inset-x-3 bottom-3 z-[1200] rounded-[24px] border border-[#2a7a2f] bg-[#2f8734] px-2 py-2 shadow-[0_18px_40px_rgba(47,135,52,0.22)] backdrop-blur md:inset-x-4 md:bottom-4 lg:static lg:mt-3 lg:rounded-[32px] lg:border-[#cfe0cd] lg:bg-white lg:px-4 lg:py-2 lg:shadow-[0_14px_30px_rgba(59,94,57,0.08)] lg:backdrop-blur-0">
           <div className="grid grid-cols-5 gap-2 lg:gap-3">
@@ -329,39 +321,84 @@ export function MainRedesignPreview({
                 <span className="hidden lg:inline">Карта</span>
               </span>
             </Link>
-            <Link
-              href="/reports"
-              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
-            >
-              <span className="flex items-center gap-0 lg:gap-3">
-                <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
-                <span className="hidden lg:inline">Все заявки</span>
-              </span>
-            </Link>
-            <Link
-              href="/learning"
-              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
-            >
-              <span className="flex items-center gap-0 lg:gap-3">
-                <BookOpenText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
-                <span className="hidden lg:inline">Обучение</span>
-              </span>
-              <span className="hidden lg:inline-flex">
-                <DemoBadge />
-              </span>
-            </Link>
-            <Link
-              href="/community"
-              className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
-            >
-              <span className="flex items-center gap-0 lg:gap-3">
-                <Users size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
-                <span className="hidden lg:inline">Сообщество</span>
-              </span>
-              <span className="hidden lg:inline-flex">
-                <DemoBadge />
-              </span>
-            </Link>
+            {isGuestView ? (
+              <button
+                type="button"
+                onClick={() => openGuestAuthModal()}
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                  <span className="hidden lg:inline">Все заявки</span>
+                </span>
+              </button>
+            ) : (
+              <Link
+                href="/reports"
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  <FileText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                  <span className="hidden lg:inline">Все заявки</span>
+                </span>
+              </Link>
+            )}
+            {isGuestView ? (
+              <button
+                type="button"
+                onClick={() => openGuestAuthModal()}
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  <BookOpenText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                  <span className="hidden lg:inline">Обучение</span>
+                </span>
+                <span className="hidden lg:inline-flex">
+                  <DemoBadge />
+                </span>
+              </button>
+            ) : (
+              <Link
+                href="/learning"
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  <BookOpenText size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                  <span className="hidden lg:inline">Обучение</span>
+                </span>
+                <span className="hidden lg:inline-flex">
+                  <DemoBadge />
+                </span>
+              </Link>
+            )}
+            {isGuestView ? (
+              <button
+                type="button"
+                onClick={() => openGuestAuthModal()}
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  <Users size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                  <span className="hidden lg:inline">Сообщество</span>
+                </span>
+                <span className="hidden lg:inline-flex">
+                  <DemoBadge />
+                </span>
+              </button>
+            ) : (
+              <Link
+                href="/community"
+                className="flex items-center justify-center rounded-[18px] border border-transparent bg-transparent px-2 py-3 text-left text-[15px] font-medium text-[#f7fbf3] transition hover:bg-white/10 lg:justify-between lg:bg-[#f3f7f1] lg:px-4 lg:py-2 lg:text-[#173221] lg:hover:bg-[#edf4ea]"
+              >
+                <span className="flex items-center gap-0 lg:gap-3">
+                  <Users size={24} className="text-[#f7fbf3] lg:text-[#173221]" strokeWidth={2.2} />
+                  <span className="hidden lg:inline">Сообщество</span>
+                </span>
+                <span className="hidden lg:inline-flex">
+                  <DemoBadge />
+                </span>
+              </Link>
+            )}
           </div>
         </section>
 
@@ -374,11 +411,6 @@ export function MainRedesignPreview({
                     <FileText size={20} className="text-[#2f8734]" strokeWidth={2} />
                     <span>{isGuestView ? "Пульс района" : "Заявки"}</span>
                   </h2>
-                  <p className="mt-2 text-sm text-[#587160]">
-                    {isGuestView
-                      ? "Публичная сводка по обращениям: видно масштаб, динамику и то, где нужна поддержка."
-                      : "Персональная панель по обращениям и вашему прогрессу в GreenStep."}
-                  </p>
                 </div>
               </div>
 
@@ -411,34 +443,29 @@ export function MainRedesignPreview({
                 </h2>
                 <DemoBadge />
               </div>
-              {!isGuestView ? (
-                <p className="mt-2 text-[13px] font-medium uppercase tracking-[0.08em] text-[#6b7f71]">
-                  ТОП-3 обсуждений:
-                </p>
-              ) : null}
-              {isGuestView ? (
-                <div className="mt-2 rounded-[18px] bg-[#f3f7f1] px-4 py-2">
-                  <p className="text-[13px] leading-5 font-medium text-[#23442d]">
-                    В фокусе: кто уже двигает район вперёд и какие инициативы собирают соседей.
-                  </p>
-                </div>
-              ) : null}
+              <p className="mt-2 text-[13px] font-medium uppercase tracking-[0.08em] text-[#6b7f71]">
+                {isGuestView ? "Топ-3 участника" : "ТОП-3 обсуждений:"}
+              </p>
               <div className="mt-2.5 space-y-2">
                 {isGuestView ? (
                   <>
                     {[
-                      ["Айша", "420 баллов", "Запустила сортировку пластика у трёх домов"],
-                      ["Тимур", "365 баллов", "Собрал соседей на весеннюю уборку двора"],
-                      ["Салтанат", "310 баллов", "Следит за обновлениями по обращениям района"],
-                    ].map(([name, score, text]) => (
-                      <div key={name} className="rounded-[18px] bg-[#f3f7f1] px-4 py-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-[16px] font-semibold text-[#12351d]">{name}</p>
-                          <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2f8d3f]">
-                            {score}
+                      ["Айша", "420 баллов", "bg-[#fbe7dd] text-[#b85d2b]"],
+                      ["Тимур", "365 баллов", "bg-[#e3efff] text-[#3367b8]"],
+                      ["Салтанат", "310 баллов", "bg-[#e6f4e7] text-[#2f8734]"],
+                    ].map(([name, score, avatarTone]) => (
+                      <div key={name} className="flex items-center justify-between gap-3 rounded-[18px] bg-[#f3f7f1] px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`grid h-11 w-11 shrink-0 place-items-center rounded-full text-[16px] font-semibold shadow-sm ${avatarTone}`}
+                          >
+                            {name.slice(0, 1)}
                           </span>
+                          <p className="text-[16px] font-semibold text-[#12351d]">{name}</p>
                         </div>
-                        <p className="mt-2 text-[14px] leading-5 text-[#5d7361]">{text}</p>
+                        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2f8d3f]">
+                          {score}
+                        </span>
                       </div>
                     ))}
                   </>
@@ -455,12 +482,24 @@ export function MainRedesignPreview({
                     ))}
                   </>
                 )}
-                <Link
-                  href="/community"
-                  className="mx-auto flex w-fit rounded-[18px] border border-[#d4e4d2] bg-white px-5 py-1.5 text-[14px] font-medium text-[#6b6659] transition hover:bg-[#f6faf5]"
-                >
-                  Предложить инициативу
-                </Link>
+                {isGuestView ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openGuestAuthModal()
+                    }
+                    className="mx-auto flex w-fit rounded-[18px] border border-[#d4e4d2] bg-white px-5 py-1.5 text-[14px] font-medium text-[#6b6659] transition hover:bg-[#f6faf5]"
+                  >
+                    Предложить инициативу
+                  </button>
+                ) : (
+                  <Link
+                    href="/community"
+                    className="mx-auto flex w-fit rounded-[18px] border border-[#d4e4d2] bg-white px-5 py-1.5 text-[14px] font-medium text-[#6b6659] transition hover:bg-[#f6faf5]"
+                  >
+                    Предложить инициативу
+                  </Link>
+                )}
               </div>
             </section>
           </div>
@@ -477,28 +516,56 @@ export function MainRedesignPreview({
                 <PreviewReportsMapLoader
                   basePath={basePath}
                   currentUserId={isGuestView ? null : currentUserId}
-                  expandHref={isGuestView ? guestMapExpandHref : "/map"}
-                  expandLabel={isGuestView ? "Открыть выбранную заявку" : "Развернуть карту"}
+                  expandHref="/map"
+                  expandLabel="Развернуть карту"
+                  onExpandClick={null}
                   previewModeEnabled={previewModeEnabled}
                   reports={reports}
                 />
               </div>
 
               <div className="mt-5 flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-                <Link
-                  href={primaryCtaHref}
-                  className="hidden w-full items-center justify-center gap-2 rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto lg:inline-flex"
-                  style={{ color: "#ffffff" }}
-                >
-                  <FilePlus size={18} strokeWidth={2.2} />
-                  Сообщить о проблеме
-                </Link>
-                <Link
-                  href={secondaryCtaHref}
-                  className="inline-flex w-full items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-6 py-3 text-[15px] font-semibold text-[#28452e] transition hover:bg-[#f6faf5] sm:w-auto"
-                >
-                  Список заявок
-                </Link>
+                {isGuestView ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openGuestAuthModal()
+                      }
+                      className="hidden w-full items-center justify-center gap-2 rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto lg:inline-flex"
+                      style={{ color: "#ffffff" }}
+                    >
+                      <FilePlus size={18} strokeWidth={2.2} />
+                      Сообщить о проблеме
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openGuestAuthModal()
+                      }
+                      className="inline-flex w-full items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-6 py-3 text-[15px] font-semibold text-[#28452e] transition hover:bg-[#f6faf5] sm:w-auto"
+                    >
+                      Список заявок
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href={primaryCtaHref}
+                      className="hidden w-full items-center justify-center gap-2 rounded-full bg-[#2f8734] px-6 py-3 text-[15px] font-semibold text-white shadow-[0_18px_30px_rgba(47,135,52,0.22)] transition hover:bg-[#286f2c] sm:w-auto lg:inline-flex"
+                      style={{ color: "#ffffff" }}
+                    >
+                      <FilePlus size={18} strokeWidth={2.2} />
+                      Сообщить о проблеме
+                    </Link>
+                    <Link
+                      href={secondaryCtaHref}
+                      className="inline-flex w-full items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-6 py-3 text-[15px] font-semibold text-[#28452e] transition hover:bg-[#f6faf5] sm:w-auto"
+                    >
+                      Список заявок
+                    </Link>
+                  </>
+                )}
                 {previewModeEnabled ? (
                   <div className="inline-flex w-full items-center justify-between rounded-full border border-[#cfe0cd] bg-[#f3f7f1] p-1 sm:w-auto sm:justify-start">
                     <Link
@@ -543,15 +610,17 @@ export function MainRedesignPreview({
                   </p>
                 </div>
                 <div className="grid grid-cols-[54px_minmax(0,1fr)] items-center gap-2 pt-4">
-                  <div
-                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center self-center rounded-full p-[5px]"
-                    style={getGaugeStyle(ecoIndex)}
-                  >
-                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#4f9663] text-[#f7fbf3]">
+                  <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center self-center rounded-full border border-white/32 bg-white/28 p-[4px] shadow-[0_10px_24px_rgba(12,38,20,0.12)]">
+                    <div
+                      className="flex h-full w-full items-center justify-center rounded-full p-[5px]"
+                      style={getGaugeStyle(ecoIndex)}
+                    >
+                      <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#4f9663] text-[#f7fbf3]">
                       <p className="text-[16px] font-semibold leading-none">{ecoIndex}</p>
                       <p className="mt-0.5 text-[6px] font-semibold uppercase tracking-[0.12em] text-[#f0fbef]">
                         {ecoLabel}
                       </p>
+                      </div>
                     </div>
                   </div>
 
@@ -581,21 +650,21 @@ export function MainRedesignPreview({
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="flex items-center gap-2 text-[18px] font-semibold text-[#12351d]">
                       <BarChart3 size={20} className="text-[#2f8734]" strokeWidth={2} />
-                      <span>Обзор района</span>
+                      <span>Статистика</span>
                     </h2>
                     <DemoBadge />
                   </div>
                   <p className="mt-2 text-sm text-[#587160]">
-                    Публичный срез для гостя: видно темп района, текущую нагрузку и куда сейчас смотрят соседи.
+                    Смешение реальных и demo-метрик
                   </p>
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     {[
-                      ["Активных точек", String(activeReports)],
-                      ["Решено за месяц", String(resolvedThisMonth)],
-                      ["Поддержек", String(selectedGuestReport?.support_count ?? 0)],
-                      ["Эко-индекс", String(ecoIndex)],
+                      ["Качество воздуха", "72%"],
+                      ["Переработка отходов", "18 т"],
+                      ["Обращения", String(activeReports)],
+                      ["Динамика", "+12%"],
                     ].map(([label, value]) => (
-                      <div key={label} className="rounded-[18px] bg-[#f3f7f1] px-4 py-4">
+                      <div key={label} className="flex min-h-[118px] flex-col rounded-[18px] bg-[#f3f7f1] px-4 py-4">
                         <p className="text-[12px] uppercase tracking-[0.12em] text-[#6c8770]">{label}</p>
                         <p className="mt-2.5 text-[29px] font-semibold leading-none tracking-[-0.03em] text-[#12351d]">
                           {value}
@@ -650,65 +719,105 @@ export function MainRedesignPreview({
                 </h2>
                 <DemoBadge />
               </div>
-              <p className="mt-2 text-sm text-[#587160]">
-                {isGuestView
-                  ? "Promo-слой для конкурсного MVP: участие открывается после входа, а витрина помогает почувствовать активность района."
-                  : "Короткий demo-челлендж"}
-              </p>
-              <h3 className="mt-3 text-[16px] font-semibold text-[#12351d]">
-                {isGuestView ? "Неделя соседских экопривычек" : "7 дней без лишнего пластика"}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-[#4f6856]">
-                {isGuestView
-                  ? "Жители выбирают простые действия на неделю: сортировка дома, отказ от одноразового пластика и поддержка локальных заявок."
-                  : "Выполнено 5 из 7 дней. Награда после завершения."}
-              </p>
-              <div className="mt-4 h-3 rounded-full bg-[#e2ebdf]">
-                <div
-                  className={`h-full rounded-full bg-[#2f8734] ${isGuestView ? "w-[58%]" : "w-[72%]"}`}
-                />
-              </div>
-              <div className="mt-4 flex items-center justify-between rounded-[20px] bg-[#f3f7f1] px-4 py-4">
-                <div>
-                  <p className="text-[15px] font-medium text-[#173221]">
-                    {isGuestView ? "Уже участвуют 24 соседа" : "Превью награды"}
-                  </p>
-                  <p className="mt-1 text-sm text-[#6b7f71]">
-                    {isGuestView
-                      ? "Вход откроет участие, историю прогресса и персональные награды."
-                      : "Эко-значок активиста"}
-                  </p>
-                </div>
-                {isGuestView ? (
-                  <Link
-                    href={signInHref}
-                    className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+              {isGuestView ? (
+                <>
+                  <div className="mt-3 rounded-[20px] bg-[#f3f7f1] px-4 py-4">
+                    <p className="text-[15px] leading-6 text-[#4f6856]">
+                      Выполняй задания, зарабатывай баллы и обменивай их на полезные вещи.
+                    </p>
+                  </div>
+                  <div className="mt-3 rounded-[20px] bg-[#f3f7f1] px-4 py-4">
+                    <p className="text-[15px] text-[#173221]">
+                      Уже участвуют <span className="font-semibold">24 пользователя</span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openGuestAuthModal()}
+                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
                   >
-                    Хочу участвовать
-                  </Link>
-                ) : (
-                  <Link
-                    href="/tasks"
-                    className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
-                  >
-                    Подробнее
-                  </Link>
-                )}
-              </div>
+                    Участвовать
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="mt-2 text-sm text-[#587160]">Короткий demo-челлендж</p>
+                  <h3 className="mt-3 text-[16px] font-semibold text-[#12351d]">
+                    7 дней без лишнего пластика
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-[#4f6856]">
+                    Выполнено 5 из 7 дней. Награда после завершения.
+                  </p>
+                  <div className="mt-4 h-3 rounded-full bg-[#e2ebdf]">
+                    <div className="h-full w-[72%] rounded-full bg-[#2f8734]" />
+                  </div>
+                  <div className="mt-4 flex items-center justify-between rounded-[20px] bg-[#f3f7f1] px-4 py-4">
+                    <div>
+                      <p className="text-[15px] font-medium text-[#173221]">Превью награды</p>
+                      <p className="mt-1 text-sm text-[#6b7f71]">Эко-значок активиста</p>
+                    </div>
+                    <Link
+                      href="/tasks"
+                      className="rounded-full border border-[#d4e4d2] bg-white px-5 py-3 text-sm font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+                    >
+                      Подробнее
+                    </Link>
+                  </div>
+                </>
+              )}
             </section>
           </div>
         </section>
       </div>
 
-      <Link
-        href={primaryCtaHref}
-        aria-label="Сообщить о проблеме"
-        className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
-        style={{ color: "#ffffff" }}
-      >
-        <FilePlus size={22} strokeWidth={2.3} />
-      </Link>
+      {isGuestView ? (
+        <button
+          type="button"
+          aria-label="Сообщить о проблеме"
+          onClick={() =>
+            openGuestAuthModal()
+          }
+          className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
+          style={{ color: "#ffffff" }}
+        >
+          <FilePlus size={22} strokeWidth={2.3} />
+        </button>
+      ) : (
+        <Link
+          href={primaryCtaHref}
+          aria-label="Сообщить о проблеме"
+          className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
+          style={{ color: "#ffffff" }}
+        >
+          <FilePlus size={22} strokeWidth={2.3} />
+        </Link>
+      )}
+      {guestAuthModal ? (
+        <div className="fixed inset-0 z-[1500] flex items-center justify-center bg-[#173a20]/35 px-4">
+          <div className="w-full max-w-md rounded-[28px] border border-[#d4e4d2] bg-white p-6 shadow-[0_24px_80px_rgba(33,72,43,0.18)]">
+            <h3 className="text-[24px] font-semibold tracking-[-0.04em] text-[#12351d]">
+              {guestAuthModal.title}
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-[#587160]">{guestAuthModal.text}</p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setGuestAuthModal(null)}
+                className="inline-flex items-center justify-center rounded-2xl border border-[#d4e4d2] px-4 py-3 font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+              >
+                Позже
+              </button>
+              <Link
+                href={signInHref}
+                onClick={() => setGuestAuthModal(null)}
+                className="inline-flex items-center justify-center rounded-2xl bg-[#2f8734] px-4 py-3 font-semibold text-white transition hover:bg-[#286f2c]" style={{ color: "#ffffff" }}
+              >
+                Войти
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
-

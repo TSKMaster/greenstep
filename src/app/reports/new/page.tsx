@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppShellChrome } from "@/components/layout/app-shell-chrome";
 import { ReportForm } from "@/components/reports/report-form";
@@ -36,12 +35,6 @@ export default async function NewReportPage() {
               </h1>
             </div>
             <ReportForm userId={user.id} />
-            <Link
-              href="/"
-              className="mt-6 inline-flex text-sm font-medium text-primary"
-            >
-              Вернуться на главную
-            </Link>
           </section>
         </div>
       </div>

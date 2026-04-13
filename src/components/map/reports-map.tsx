@@ -42,6 +42,11 @@ export function ReportsMap({
 }: ReportsMapProps) {
   const [selectedCategories, setSelectedCategories] =
     useState<ReportCategory[]>(REPORT_CATEGORY_ORDER);
+  const [guestAuthModal, setGuestAuthModal] = useState<{
+    title: string;
+    text: string;
+  } | null>(null);
+  const isGuestView = !currentUserId;
 
   const categoryCounts = useMemo(() => getReportCategoryCounts(reports), [reports]);
   const filteredReports = useMemo(
@@ -57,6 +62,29 @@ export function ReportsMap({
     );
   }
 
+  function openGuestAuthModal() {
+    setGuestAuthModal({
+      title: "Нужно войти в GreenStep",
+      text: "Чтобы использовать данную функцию приложения, необходимо войти.",
+    });
+  }
+
+  useEffect(() => {
+    if (!isGuestView) {
+      return;
+    }
+
+    function handleGuestAuthRequired() {
+      openGuestAuthModal();
+    }
+
+    window.addEventListener("greenstep:guest-auth-required", handleGuestAuthRequired);
+
+    return () => {
+      window.removeEventListener("greenstep:guest-auth-required", handleGuestAuthRequired);
+    };
+  }, [isGuestView]);
+
   return (
     <div className="flex flex-col gap-3">
       <div className="relative h-[720px] overflow-hidden rounded-[28px] border border-border">
@@ -69,28 +97,53 @@ export function ReportsMap({
               selectedCategories={selectedCategories}
             />
             {showCreateCta ? (
-              <Link
-                href="/reports/new"
-                aria-label="Новое обращение"
-                className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#2f8734] px-5 py-3 text-sm font-semibold !text-white shadow-[0_14px_24px_rgba(47,135,52,0.24)] transition hover:bg-[#286f2c]"
-                style={{ color: "#ffffff" }}
-              >
-                <FilePlus size={18} strokeWidth={2.2} className="text-white" />
-                Новое обращение
-              </Link>
+              isGuestView ? (
+                <button
+                  type="button"
+                  onClick={openGuestAuthModal}
+                  aria-label="Новое обращение"
+                  className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#2f8734] px-5 py-3 text-sm font-semibold !text-white shadow-[0_14px_24px_rgba(47,135,52,0.24)] transition hover:bg-[#286f2c]"
+                  style={{ color: "#ffffff" }}
+                >
+                  <FilePlus size={18} strokeWidth={2.2} className="text-white" />
+                  Новое обращение
+                </button>
+              ) : (
+                <Link
+                  href="/reports/new"
+                  aria-label="Новое обращение"
+                  className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#2f8734] px-5 py-3 text-sm font-semibold !text-white shadow-[0_14px_24px_rgba(47,135,52,0.24)] transition hover:bg-[#286f2c]"
+                  style={{ color: "#ffffff" }}
+                >
+                  <FilePlus size={18} strokeWidth={2.2} className="text-white" />
+                  Новое обращение
+                </Link>
+              )
             ) : null}
           </div>
         </div>
 
         {showCreateCta ? (
-          <Link
-            href="/reports/new"
-            aria-label="Новое обращение"
-            className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] !text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
-            style={{ color: "#ffffff" }}
-          >
-            <FilePlus size={22} strokeWidth={2.3} className="text-white" />
-          </Link>
+          isGuestView ? (
+            <button
+              type="button"
+              onClick={openGuestAuthModal}
+              aria-label="Новое обращение"
+              className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] !text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
+              style={{ color: "#ffffff" }}
+            >
+              <FilePlus size={22} strokeWidth={2.3} className="text-white" />
+            </button>
+          ) : (
+            <Link
+              href="/reports/new"
+              aria-label="Новое обращение"
+              className="fixed bottom-[92px] right-4 z-[1300] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2f8734] !text-white shadow-[0_18px_32px_rgba(47,135,52,0.3)] transition hover:bg-[#286f2c] lg:hidden"
+              style={{ color: "#ffffff" }}
+            >
+              <FilePlus size={22} strokeWidth={2.3} className="text-white" />
+            </Link>
+          )
         ) : null}
 
         <MapContainer
@@ -121,6 +174,34 @@ export function ReportsMap({
           selectedCategories={selectedCategories}
         />
       </div>
+
+      {guestAuthModal ? (
+        <div className="fixed inset-0 z-[1500] flex items-center justify-center bg-[#173a20]/35 px-4">
+          <div className="w-full max-w-md rounded-[28px] border border-[#d4e4d2] bg-white p-6 shadow-[0_24px_80px_rgba(33,72,43,0.18)]">
+            <h3 className="text-[24px] font-semibold tracking-[-0.04em] text-[#12351d]">
+              {guestAuthModal.title}
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-[#587160]">{guestAuthModal.text}</p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setGuestAuthModal(null)}
+                className="inline-flex items-center justify-center rounded-2xl border border-[#d4e4d2] px-4 py-3 font-semibold text-[#28452e] transition hover:bg-[#f6faf5]"
+              >
+                Позже
+              </button>
+              <Link
+                href="/auth/sign-in"
+                onClick={() => setGuestAuthModal(null)}
+                className="inline-flex items-center justify-center rounded-2xl bg-[#2f8734] px-4 py-3 font-semibold text-white transition hover:bg-[#286f2c]"
+                style={{ color: "#ffffff" }}
+              >
+                Войти
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
