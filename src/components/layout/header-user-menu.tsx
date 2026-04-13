@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, LogOut, UserCircle2 } from "lucide-react";
+import { ChevronDown, LogOut, Shield, UserCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -103,10 +103,20 @@ export function HeaderUserMenu({
             <p className="truncate text-sm font-semibold text-[#173221]">{resolvedDisplayName}</p>
             <p className="mt-1 truncate text-xs text-[#5f7464]">{email}</p>
           </div>
+          {isAdmin ? (
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="mt-2 flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-medium text-[#173221] transition hover:bg-[#f3f7f1]"
+            >
+              <Shield size={18} className="text-[#2f8734]" strokeWidth={2.2} />
+              Админка
+            </Link>
+          ) : null}
           <Link
             href="/profile"
             onClick={() => setIsOpen(false)}
-            className="mt-2 flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-medium text-[#173221] transition hover:bg-[#f3f7f1]"
+            className={`${isAdmin ? "" : "mt-2 "}flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-medium text-[#173221] transition hover:bg-[#f3f7f1]`}
           >
             <UserCircle2 size={18} className="text-[#2f8734]" strokeWidth={2.2} />
             Профиль
