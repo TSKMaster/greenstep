@@ -627,11 +627,11 @@ export function MainRedesignPreview({
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   {[
                     ["Качество воздуха", "72%"],
-                    ["Переработка", "18 т"],
+                    ["Переработка отходов", "18 т"],
                     ["Обращения", String(activeReports)],
                     ["Динамика", "+12%"],
                   ].map(([label, value]) => (
-                    <div key={label} className="rounded-[18px] bg-[#f3f7f1] px-4 py-4">
+                    <div key={label} className="flex min-h-[118px] flex-col rounded-[18px] bg-[#f3f7f1] px-4 py-4">
                       <p className="text-[12px] uppercase tracking-[0.12em] text-[#6c8770]">{label}</p>
                       <p className="mt-2.5 text-[29px] font-semibold leading-none tracking-[-0.03em] text-[#12351d]">
                         {value}
