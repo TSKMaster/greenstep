@@ -21,8 +21,8 @@ const markerIcon = icon({
 });
 
 type ReportLocationPickerProps = {
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   onChange: (nextLatitude: number, nextLongitude: number) => void;
 };
 
@@ -42,12 +42,20 @@ function ResizeMapOnMount() {
   const map = useMap();
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
+    const container = map.getContainer();
+    const invalidate = () => {
       map.invalidateSize();
-    }, 0);
+    };
+    const timer = window.setTimeout(invalidate, 0);
+    const resizeObserver = new ResizeObserver(() => {
+      invalidate();
+    });
+
+    resizeObserver.observe(container);
 
     return () => {
       window.clearTimeout(timer);
+      resizeObserver.disconnect();
     };
   }, [map]);
 
@@ -59,9 +67,11 @@ export function ReportLocationPicker({
   longitude,
   onChange,
 }: ReportLocationPickerProps) {
+  const hasMarker =
+    Number.isFinite(latitude) && Number.isFinite(longitude);
   const center: [number, number] = [
-    Number.isFinite(latitude) ? latitude : DEFAULT_MAP_CENTER.lat,
-    Number.isFinite(longitude) ? longitude : DEFAULT_MAP_CENTER.lng,
+    hasMarker ? (latitude as number) : DEFAULT_MAP_CENTER.lat,
+    hasMarker ? (longitude as number) : DEFAULT_MAP_CENTER.lng,
   ];
 
   return (
@@ -78,7 +88,7 @@ export function ReportLocationPicker({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapClickHandler onChange={onChange} />
-        <Marker position={center} icon={markerIcon} />
+        {hasMarker ? <Marker position={center} icon={markerIcon} /> : null}
       </MapContainer>
     </div>
   );

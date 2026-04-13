@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, Camera, CheckCircle2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReportLocationPickerLoader } from "@/components/reports/report-location-picker-loader";
-import { DEFAULT_MAP_CENTER, REPORT_CATEGORIES } from "@/lib/constants";
+import { REPORT_CATEGORIES } from "@/lib/constants";
 import { getReportSubmissionErrorMessage } from "@/lib/error-messages";
 import {
   REPORT_DESCRIPTION_MAX_LENGTH,
@@ -43,11 +43,12 @@ export function ReportForm({ userId }: ReportFormProps) {
   const router = useRouter();
   const addressLookupControllerRef = useRef<AbortController | null>(null);
   const isAddressManuallyEditedRef = useRef(false);
+
   const [category, setCategory] = useState<ReportCategory>(REPORT_CATEGORIES[0]);
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
-  const [latitude, setLatitude] = useState(String(DEFAULT_MAP_CENTER.lat));
-  const [longitude, setLongitude] = useState(String(DEFAULT_MAP_CENTER.lng));
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
@@ -134,6 +135,11 @@ export function ReportForm({ userId }: ReportFormProps) {
     setLongitude(nextLongitude.toFixed(6));
     setHasSelectedLocation(true);
     isAddressManuallyEditedRef.current = false;
+    setFieldErrors((current) => ({
+      ...current,
+      latitude: undefined,
+      longitude: undefined,
+    }));
     void resolveAddressFromCoordinates(nextLatitude, nextLongitude);
   }
 
@@ -221,7 +227,7 @@ export function ReportForm({ userId }: ReportFormProps) {
       setFieldErrors(validation.fieldErrors);
       setPendingStepAlert(
         [
-          !isStep1Complete ? "Шаг 1: отметь точку на карте." : null,
+          !isStep1Complete ? "Шаг 1: поставь метку на карте." : null,
           !isStep2Complete ? "Шаг 2: заполни описание обращения." : null,
         ].filter((item): item is string => Boolean(item)),
       );
@@ -306,7 +312,11 @@ export function ReportForm({ userId }: ReportFormProps) {
     !fieldErrors.address;
 
   return (
-    <form className="mt-6 flex flex-col gap-4 lg:mt-0 lg:gap-5" onSubmit={handleSubmit}>
+    <form
+      noValidate
+      className="mt-6 flex flex-col gap-4 lg:mt-0 lg:gap-5"
+      onSubmit={handleSubmit}
+    >
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch">
         <section className="rounded-[28px] border border-[#d4e4d2] bg-[#f7fbf6] p-4 shadow-sm lg:flex lg:h-full lg:flex-col lg:p-5">
           <div className="mb-4">
@@ -316,7 +326,7 @@ export function ReportForm({ userId }: ReportFormProps) {
                   Шаг 1
                 </p>
                 <h2 className="mt-2 text-xl font-semibold text-primary-dark">
-                  Отметь точку на карте
+                  Поставь метку на карте
                 </h2>
               </div>
 
@@ -336,61 +346,29 @@ export function ReportForm({ userId }: ReportFormProps) {
               </div>
             </div>
             <p className="mt-2 text-sm leading-6 text-foreground/70">
-              Нажми на карту, чтобы поставить точку проблемы. Координаты ниже
-              обновятся автоматически.
+              Нажми на карту, чтобы поставить точку проблемы. После выбора мы
+              автоматически определим адрес.
             </p>
           </div>
 
           <div className="mt-4 lg:flex lg:flex-1 lg:flex-col lg:pb-4">
             <ReportLocationPickerLoader
-              latitude={Number(latitude)}
-              longitude={Number(longitude)}
+              latitude={latitude.trim().length > 0 ? Number(latitude) : null}
+              longitude={longitude.trim().length > 0 ? Number(longitude) : null}
               onChange={updateCoordinates}
             />
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-auto">
-            <label className="flex flex-col gap-2 text-sm text-foreground/80">
-              Широта
-              <input
-                required
-                type="text"
-                value={latitude}
-                onChange={(event) => {
-                  setHasSelectedLocation(true);
-                  setLatitude(event.target.value);
-                  setFieldErrors((current) => ({ ...current, latitude: undefined }));
-                }}
-                inputMode="decimal"
-                className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
-                  fieldErrors.latitude ? "border-red-400" : "border-border"
-                }`}
-              />
-              {fieldErrors.latitude ? (
-                <p className="text-xs text-red-700">{fieldErrors.latitude}</p>
-              ) : null}
-            </label>
-
-            <label className="flex flex-col gap-2 text-sm text-foreground/80">
-              Долгота
-              <input
-                required
-                type="text"
-                value={longitude}
-                onChange={(event) => {
-                  setHasSelectedLocation(true);
-                  setLongitude(event.target.value);
-                  setFieldErrors((current) => ({ ...current, longitude: undefined }));
-                }}
-                inputMode="decimal"
-                className={`rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-primary ${
-                  fieldErrors.longitude ? "border-red-400" : "border-border"
-                }`}
-              />
-              {fieldErrors.longitude ? (
-                <p className="text-xs text-red-700">{fieldErrors.longitude}</p>
-              ) : null}
-            </label>
+          <div className="mt-4 lg:mt-auto">
+            {hasSelectedLocation ? (
+              <p className="rounded-2xl border border-[#d4e4d2] bg-white px-4 py-3 text-sm text-foreground/75">
+                Точка выбрана на карте: {latitude}, {longitude}
+              </p>
+            ) : (
+              <p className="rounded-2xl border border-dashed border-[#d4e4d2] bg-white px-4 py-3 text-sm text-foreground/65">
+                Поставь метку на карте, чтобы продолжить заполнение заявки.
+              </p>
+            )}
           </div>
         </section>
 
@@ -447,7 +425,6 @@ export function ReportForm({ userId }: ReportFormProps) {
               <label className="flex flex-col gap-2 text-sm text-foreground/80">
                 Описание
                 <textarea
-                  required
                   rows={5}
                   value={description}
                   onChange={(event) => {
@@ -466,8 +443,8 @@ export function ReportForm({ userId }: ReportFormProps) {
                   </span>
                 </div>
                 <p className="text-xs text-foreground/60">
-                  Минимум {REPORT_DESCRIPTION_MIN_LENGTH} символов, чтобы было понятно,
-                  что произошло.
+                  Минимум {REPORT_DESCRIPTION_MIN_LENGTH} символов, чтобы было
+                  понятно, что произошло.
                 </p>
               </label>
 
@@ -517,6 +494,9 @@ export function ReportForm({ userId }: ReportFormProps) {
             </div>
 
             <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed border-border bg-white px-4 py-6 text-center transition hover:bg-surface">
+              <span className="mb-3 grid h-12 w-12 place-items-center rounded-full border border-[#d4e4d2] bg-[#f7fbf6] text-[#2f8734]">
+                <Camera size={22} strokeWidth={2.1} />
+              </span>
               <span className="text-sm font-semibold text-primary-dark">
                 {photoFile ? "Заменить фото" : "Добавить фото"}
               </span>
