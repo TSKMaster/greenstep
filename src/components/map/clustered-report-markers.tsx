@@ -171,7 +171,7 @@ export function ClusteredReportMarkers({
           html: `<span>${cluster.getChildCount()}</span>`,
           iconSize: [42, 42],
         }),
-    });
+    } as L.MarkerClusterGroupOptions & { chunkedLoading: boolean });
 
     reports.forEach((report) => {
       const marker = L.marker(

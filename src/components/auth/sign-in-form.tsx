@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { getAuthErrorMessage } from "@/lib/error-messages";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -22,17 +23,21 @@ export function SignInForm() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
 
-    void supabase.auth.getSession().then(({ data }) => {
+    void (async () => {
+      const { data } = await supabase.auth.getSession();
+
       if (data.session) {
         setIsAuthorized(true);
       }
-    });
+    })();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
       setIsAuthorized(Boolean(session));
-    });
+      },
+    );
 
     return () => {
       subscription.unsubscribe();
